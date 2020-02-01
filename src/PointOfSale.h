@@ -12,6 +12,8 @@ typedef enum
     PRICING_CONFLICT = 4,   /**< Attempted to set a fixed price and per pound price to same item */
     ITEM_CONFLICT    = 5,   /**< Price for SKU configured as Fixed point but item added as Per Pound, or vice versa. */
     INVALID_SKU      = 6,   /**< An Invalid SKU was provided to the API */
+    NO_PRICE_DEFINED = 7,   /**< Prices have not been defined for all items in the cart */
+    INVALID_WEIGHT   = 8,   /**< An invalid weight was provided to the API */
 } ReturnCode_t;
 
 typedef int Transaction_ID;
@@ -30,8 +32,11 @@ class PointOfSale
         ReturnCode_t setPerPoundPrice( std::string sku, double price );
 
         // Provide mechanism to scan an item into the system as point a fixed price or a by the pound
-        Transaction_ID addItem( std::string sku );
-        Transaction_ID addItem( std::string sku, double pounds );
+        ReturnCode_t addItem( std::string sku );
+        ReturnCode_t addItem( std::string sku, double pounds );
+
+        // TODO - Ensure that test is created where items were added and no price is defined before attempting to calculate total price
+        double getPreTaxTotal();
 
     protected:
 

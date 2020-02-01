@@ -51,10 +51,59 @@ TEST (PointOfSaleTest, updateItemPrice){
 
 }
 
-TEST (PointOfSaleTest, invalidSku){
+TEST (PointOfSaleTest, setPriceInvalidSku){
 
     PointOfSale sale;
     EXPECT_EQ( INVALID_SKU, sale.setItemPrice( "", 1.89 ) );
     EXPECT_EQ( INVALID_SKU, sale.setPerPoundPrice( "", 2.50 ) );
+
+}
+
+TEST (PointOfSaleTest, addItemInvalidSku){
+
+    PointOfSale sale;
+    EXPECT_EQ( INVALID_SKU, sale.addItem( "" ) );
+    EXPECT_EQ( INVALID_SKU, sale.addItem( "", 2.50 ) );
+
+}
+
+TEST (PointOfSaleTest, addItemNegativeWeight){
+
+    PointOfSale sale;
+    sale.setItemPrice( "bananas", 2.50 );
+    EXPECT_EQ( INVALID_WEIGHT, sale.addItem( "bananas", -1.0 ) );
+
+}
+
+TEST (PointOfSaleTest, addItemZeroWeight){
+
+    PointOfSale sale;
+    sale.setPerPoundPrice( "bananas", 3.50 );
+    EXPECT_EQ( INVALID_WEIGHT, sale.addItem( "bananas", 0.0 ) );
+
+}
+
+TEST (PointOfSaleTest, setPriceThenAddItemOfConflictingType){
+
+    PointOfSale fixed_then_weight_sale;
+
+    // Set a price as if item is a fixed price
+    EXPECT_EQ( OK, fixed_then_weight_sale.setItemPrice( "bananas", 1.0 ) );
+
+    // attempt to item to cart as if its a weight based item
+    EXPECT_EQ( ITEM_CONFLICT, fixed_then_weight_sale.addItem( "bananas", 1.0 ) );
+
+}
+
+TEST (PointOfSaleTest, addItemBeforeSetPrice){
+
+    PointOfSale fixed_sale;
+    PointOfSale weight_sale;
+
+    // add bananas as if they are fixed price item
+    EXPECT_EQ( NO_PRICE_DEFINED, fixed_sale.addItem( "bananas" ) );
+
+    // add item as if they are a weight based item
+    EXPECT_EQ( NO_PRICE_DEFINED, weight_sale.addItem( "Ground Beef", 1.0 ) );
 
 }

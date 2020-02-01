@@ -22,12 +22,17 @@ ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
     return ERROR;
 }
 
-Transaction_ID PointOfSale::addItem( std::string sku )
+ReturnCode_t PointOfSale::addItem( std::string sku )
 {
-    return 0;
+    return ERROR;
 }
 
-Transaction_ID PointOfSale::addItem( std::string sku, double pounds )
+ReturnCode_t PointOfSale::addItem( std::string sku, double pounds )
+{
+    return ERROR;
+}
+
+double PointOfSale::getPreTaxTotal()
 {
     return 0;
 }
