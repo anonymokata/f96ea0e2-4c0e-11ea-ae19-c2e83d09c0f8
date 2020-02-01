@@ -19,6 +19,11 @@ ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
         return INVALID_PRICE;
     }
 
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+
     // check to see if price for this sku has already been added as a weight based item
     map<string,double>::iterator it = weight_prices.find(sku);
     if(it != weight_prices.end())
@@ -39,6 +44,11 @@ ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
         return INVALID_PRICE;
     }
 
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+
     // check to see if price for this sku has already been added as a weight based item
     map<string,double>::iterator it = fixed_prices.find(sku);
     if(it != fixed_prices.end())
@@ -54,12 +64,55 @@ ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
 
 ReturnCode_t PointOfSale::addItem( std::string sku )
 {
-    return ERROR;
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+
+    // check to see if price for this sku has already been added as a weight based item
+    map<string,double>::iterator it = weight_prices.find(sku);
+    if(it != weight_prices.end())
+    {
+        return ITEM_CONFLICT;
+    }
+
+    // Check to see that a price has been configured for this item
+    it = fixed_prices.find(sku);
+    if(it == fixed_prices.end())
+    {
+        return NO_PRICE_DEFINED;
+    }
+
+    return OK;
 }
 
 ReturnCode_t PointOfSale::addItem( std::string sku, double pounds )
 {
-    return ERROR;
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+
+    if(pounds <= 0.0)
+    {
+        return INVALID_WEIGHT;
+    }
+
+    // check to see if price for this sku has already been added as a weight based item
+    map<string,double>::iterator it = fixed_prices.find(sku);
+    if(it != fixed_prices.end())
+    {
+        return ITEM_CONFLICT;
+    }
+
+    // Check to see that a price has been configured for this item
+    it = weight_prices.find(sku);
+    if(it == weight_prices.end())
+    {
+        return NO_PRICE_DEFINED;
+    }
+
+    return OK;
 }
 
 double PointOfSale::getPreTaxTotal()
