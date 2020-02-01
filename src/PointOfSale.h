@@ -2,6 +2,9 @@
 #define POINT_OF_SALE_H
 
 #include <string>
+#include <map>
+
+using namespace std;
 
 typedef enum
 {
@@ -41,6 +44,9 @@ class PointOfSale
     protected:
 
     private:
+        map<string, double> fixed_prices;  // Keep track of the pricess associated with fixed price items
+        map<string, double> weight_prices; // keep track of the cost per pound of items related to weight
+
 };
 
 #endif

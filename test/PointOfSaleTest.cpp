@@ -12,8 +12,8 @@ TEST (PointOfSaleTest, setNegativePrice){
 TEST (PointOfSaleTest, setZeroPrice){
 
     PointOfSale sale;
-    EXPECT_EQ( OK, sale.setItemPrice( "bananas", 0.0 ) );
-    EXPECT_EQ( OK, sale.setPerPoundPrice( "Ground Beef", 0.0 ) );
+    EXPECT_EQ( INVALID_PRICE, sale.setItemPrice( "bananas", 0.0 ) );
+    EXPECT_EQ( INVALID_PRICE, sale.setPerPoundPrice( "Ground Beef", 0.0 ) );
 
 }
 
