@@ -1,6 +1,9 @@
 #include "gtest/gtest.h"
 #include "PointOfSale.h"
 
+// Pull in the test fixture that contains already programmed prices for items in cart
+#include "PreDefinedPricesFixture.h"
+
 TEST (PointOfSaleArgumentTest, setNegativePrice){
 
     PointOfSale sale;
@@ -51,6 +54,19 @@ TEST (PointOfSaleArgumentTest, updateItemPrice){
 
 }
 
+TEST (PointOfSaleArgumentTest, updateItemPriceAfterItemInCart){
+
+    PointOfSale sale;
+    ASSERT_EQ( OK, sale.setItemPrice( "bananas", 1.89 ) );
+    ASSERT_EQ( OK, sale.addFixedPriceItem( "bananas", 2.3 ) );
+    ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, sale.setItemPrice( "bananas", 1.89 ) );
+
+    ASSERT_EQ( OK, sale.setPerPoundPrice( "Ground Beef", 2.50 ) );
+    ASSERT_EQ( OK, sale.addItemWeight( "Ground Beef", 2.3 ) );
+    ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, sale.setPerPoundPrice( "Ground Beef", 3.89 ) );
+
+}
+
 TEST (PointOfSaleArgumentTest, setPriceInvalidSku){
 
     PointOfSale sale;
@@ -62,8 +78,8 @@ TEST (PointOfSaleArgumentTest, setPriceInvalidSku){
 TEST (PointOfSaleArgumentTest, addItemInvalidSku){
 
     PointOfSale sale;
-    ASSERT_EQ( INVALID_SKU, sale.addItem( "" ) );
-    ASSERT_EQ( INVALID_SKU, sale.addItem( "", 2.50 ) );
+    ASSERT_EQ( INVALID_SKU, sale.addFixedPriceItem( "" ) );
+    ASSERT_EQ( INVALID_SKU, sale.addItemWeight( "", 2.50 ) );
 
 }
 
@@ -71,7 +87,7 @@ TEST (PointOfSaleArgumentTest, addItemNegativeWeight){
 
     PointOfSale sale;
     sale.setItemPrice( "bananas", 2.50 );
-    ASSERT_EQ( INVALID_WEIGHT, sale.addItem( "bananas", -1.0 ) );
+    ASSERT_EQ( INVALID_WEIGHT, sale.addItemWeight( "bananas", -1.0 ) );
 
 }
 
@@ -79,7 +95,7 @@ TEST (PointOfSaleArgumentTest, addItemZeroWeight){
 
     PointOfSale sale;
     sale.setPerPoundPrice( "bananas", 3.50 );
-    ASSERT_EQ( INVALID_WEIGHT, sale.addItem( "bananas", 0.0 ) );
+    ASSERT_EQ( INVALID_WEIGHT, sale.addItemWeight( "bananas", 0.0 ) );
 
 }
 
@@ -91,7 +107,7 @@ TEST (PointOfSaleArgumentTest, setPriceThenAddItemOfConflictingType){
     ASSERT_EQ( OK, fixed_then_weight_sale.setItemPrice( "bananas", 1.0 ) );
 
     // attempt to item to cart as if its a weight based item
-    ASSERT_EQ( ITEM_CONFLICT, fixed_then_weight_sale.addItem( "bananas", 1.0 ) );
+    ASSERT_EQ( ITEM_CONFLICT, fixed_then_weight_sale.addItemWeight( "bananas", 1.0 ) );
 
 }
 
@@ -101,9 +117,13 @@ TEST (PointOfSaleArgumentTest, addItemBeforeSetPrice){
     PointOfSale weight_sale;
 
     // add bananas as if they are fixed price item
-    ASSERT_EQ( NO_PRICE_DEFINED, fixed_sale.addItem( "bananas" ) );
+    ASSERT_EQ( NO_PRICE_DEFINED, fixed_sale.addFixedPriceItem( "bananas" ) );
 
     // add item as if they are a weight based item
-    ASSERT_EQ( NO_PRICE_DEFINED, weight_sale.addItem( "Ground Beef", 1.0 ) );
+    ASSERT_EQ( NO_PRICE_DEFINED, weight_sale.addItemWeight( "Ground Beef", 1.0 ) );
 
 }
+
+
+
+// TODO - Need to add tests covering the removeItem functions

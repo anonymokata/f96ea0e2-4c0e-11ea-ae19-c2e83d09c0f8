@@ -12,7 +12,7 @@ PointOfSale::~PointOfSale()
     
 }
 
-ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
+PointOfSale::ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
 {
     if(price <= 0.0)
     {
@@ -37,7 +37,7 @@ ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
     return OK;
 }
 
-ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
+PointOfSale::ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
 {
     if(price <= 0.0)
     {
@@ -62,7 +62,7 @@ ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
     return OK;
 }
 
-ReturnCode_t PointOfSale::addItem( std::string sku )
+PointOfSale::ReturnCode_t PointOfSale::addFixedPriceItem( std::string sku )
 {
     if(sku.length() == 0)
     {
@@ -86,7 +86,7 @@ ReturnCode_t PointOfSale::addItem( std::string sku )
     return OK;
 }
 
-ReturnCode_t PointOfSale::addItem( std::string sku, double pounds )
+PointOfSale::ReturnCode_t PointOfSale::addItemWeight( std::string sku, double pounds )
 {
     if(sku.length() == 0)
     {
@@ -113,6 +113,16 @@ ReturnCode_t PointOfSale::addItem( std::string sku, double pounds )
     }
 
     return OK;
+}
+
+PointOfSale::ReturnCode_t PointOfSale::removeItem( std::string sku )
+{
+    return ERROR;
+}
+
+PointOfSale::ReturnCode_t PointOfSale::removeItemWeight( std::string sku, double pounds )
+{
+    return ERROR;
 }
 
 double PointOfSale::getPreTaxTotal()
