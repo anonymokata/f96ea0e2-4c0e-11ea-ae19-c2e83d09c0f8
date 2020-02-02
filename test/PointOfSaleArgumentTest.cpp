@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "PointOfSale.h"
 
-TEST (PointOfSaleTest, setNegativePrice){
+TEST (PointOfSaleArgumentTest, setNegativePrice){
 
     PointOfSale sale;
     ASSERT_EQ( INVALID_PRICE, sale.setItemPrice( "bananas", -1.0 ) );
@@ -9,7 +9,7 @@ TEST (PointOfSaleTest, setNegativePrice){
 
 }
 
-TEST (PointOfSaleTest, setZeroPrice){
+TEST (PointOfSaleArgumentTest, setZeroPrice){
 
     PointOfSale sale;
     ASSERT_EQ( INVALID_PRICE, sale.setItemPrice( "bananas", 0.0 ) );
@@ -17,7 +17,7 @@ TEST (PointOfSaleTest, setZeroPrice){
 
 }
 
-TEST (PointOfSaleTest, setValidPrice){
+TEST (PointOfSaleArgumentTest, setValidPrice){
 
     PointOfSale sale;
     ASSERT_EQ( OK, sale.setItemPrice( "bananas", 1.89 ) );
@@ -25,7 +25,7 @@ TEST (PointOfSaleTest, setValidPrice){
 
 }
 
-TEST (PointOfSaleTest, setConflictingPrices){
+TEST (PointOfSaleArgumentTest, setConflictingPrices){
 
     PointOfSale fixed_sale_first;
     PointOfSale weight_sale_first;
@@ -38,9 +38,9 @@ TEST (PointOfSaleTest, setConflictingPrices){
 
 }
 
-// TODO - Ensure that a test is created that has prices being updated in middle of adding items to cart. Need
-//        to verify that price is updated correctly in middle of accepting items.
-TEST (PointOfSaleTest, updateItemPrice){
+// TODO - Ensure that a test is created that has prices being updated in middle of adding items to cart. Need to ensure that this
+//        is not allowed per the project writeup that states that prices will be configured before adding items to cart.
+TEST (PointOfSaleArgumentTest, updateItemPrice){
 
     PointOfSale sale;
     ASSERT_EQ( OK, sale.setItemPrice( "bananas", 1.89 ) );
@@ -51,7 +51,7 @@ TEST (PointOfSaleTest, updateItemPrice){
 
 }
 
-TEST (PointOfSaleTest, setPriceInvalidSku){
+TEST (PointOfSaleArgumentTest, setPriceInvalidSku){
 
     PointOfSale sale;
     ASSERT_EQ( INVALID_SKU, sale.setItemPrice( "", 1.89 ) );
@@ -59,7 +59,7 @@ TEST (PointOfSaleTest, setPriceInvalidSku){
 
 }
 
-TEST (PointOfSaleTest, addItemInvalidSku){
+TEST (PointOfSaleArgumentTest, addItemInvalidSku){
 
     PointOfSale sale;
     ASSERT_EQ( INVALID_SKU, sale.addItem( "" ) );
@@ -67,7 +67,7 @@ TEST (PointOfSaleTest, addItemInvalidSku){
 
 }
 
-TEST (PointOfSaleTest, addItemNegativeWeight){
+TEST (PointOfSaleArgumentTest, addItemNegativeWeight){
 
     PointOfSale sale;
     sale.setItemPrice( "bananas", 2.50 );
@@ -75,7 +75,7 @@ TEST (PointOfSaleTest, addItemNegativeWeight){
 
 }
 
-TEST (PointOfSaleTest, addItemZeroWeight){
+TEST (PointOfSaleArgumentTest, addItemZeroWeight){
 
     PointOfSale sale;
     sale.setPerPoundPrice( "bananas", 3.50 );
@@ -83,7 +83,7 @@ TEST (PointOfSaleTest, addItemZeroWeight){
 
 }
 
-TEST (PointOfSaleTest, setPriceThenAddItemOfConflictingType){
+TEST (PointOfSaleArgumentTest, setPriceThenAddItemOfConflictingType){
 
     PointOfSale fixed_then_weight_sale;
 
@@ -95,7 +95,7 @@ TEST (PointOfSaleTest, setPriceThenAddItemOfConflictingType){
 
 }
 
-TEST (PointOfSaleTest, addItemBeforeSetPrice){
+TEST (PointOfSaleArgumentTest, addItemBeforeSetPrice){
 
     PointOfSale fixed_sale;
     PointOfSale weight_sale;
