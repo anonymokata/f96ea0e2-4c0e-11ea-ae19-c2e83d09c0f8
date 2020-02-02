@@ -36,7 +36,7 @@ TEST_F( PreDefinedPricesFixture, MultipleMixedItemsWithDuplicatesNoRemovals ){
     pSale->addItemWeight( "Bananas", 12.0 );
 
     // add the same item again to increase amount in cart
-    pSale->addFixedPriceItem( "Apples", 2.3 );
+    pSale->addItemWeight( "Apples", 2.3 );
     pSale->addFixedPriceItem( "Cookies" );
 
     // add more content of the weight based items to show it increments correctly

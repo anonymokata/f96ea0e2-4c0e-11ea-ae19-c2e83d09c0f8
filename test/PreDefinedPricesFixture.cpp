@@ -1,7 +1,9 @@
 #include "gtest/gtest.h"
 #include "PointOfSale.h"
 
-void PreDefinedPricesFixture::Setup() override {
+#include "PreDefinedPricesFixture.h"
+
+void PreDefinedPricesFixture::SetUp(){
        pSale = new PointOfSale();
 
        // Add prices for all the fixed price items that will be utilized in the tests
@@ -16,7 +18,7 @@ void PreDefinedPricesFixture::Setup() override {
        pSale->setPerPoundPrice( "Beef",    3.50 );
 }
 
-void PreDefinedPricesFixture::TearDown( ) override { 
+void PreDefinedPricesFixture::TearDown( ){ 
        delete pSale;
        pSale = 0;
    }

@@ -7,24 +7,24 @@
 TEST (PointOfSaleArgumentTest, setNegativePrice){
 
     PointOfSale sale;
-    ASSERT_EQ( INVALID_PRICE, sale.setItemPrice( "bananas", -1.0 ) );
-    ASSERT_EQ( INVALID_PRICE, sale.setPerPoundPrice( "Ground Beef", -1.0 ) );
+    ASSERT_EQ( PointOfSale::INVALID_PRICE, sale.setItemPrice( "bananas", -1.0 ) );
+    ASSERT_EQ( PointOfSale::INVALID_PRICE, sale.setPerPoundPrice( "Ground Beef", -1.0 ) );
 
 }
 
 TEST (PointOfSaleArgumentTest, setZeroPrice){
 
     PointOfSale sale;
-    ASSERT_EQ( INVALID_PRICE, sale.setItemPrice( "bananas", 0.0 ) );
-    ASSERT_EQ( INVALID_PRICE, sale.setPerPoundPrice( "Ground Beef", 0.0 ) );
+    ASSERT_EQ( PointOfSale::INVALID_PRICE, sale.setItemPrice( "bananas", 0.0 ) );
+    ASSERT_EQ( PointOfSale::INVALID_PRICE, sale.setPerPoundPrice( "Ground Beef", 0.0 ) );
 
 }
 
 TEST (PointOfSaleArgumentTest, setValidPrice){
 
     PointOfSale sale;
-    ASSERT_EQ( OK, sale.setItemPrice( "bananas", 1.89 ) );
-    ASSERT_EQ( OK, sale.setPerPoundPrice( "Ground Beef", 2.50 ) );
+    ASSERT_EQ( PointOfSale::OK, sale.setItemPrice( "bananas", 1.89 ) );
+    ASSERT_EQ( PointOfSale::OK, sale.setPerPoundPrice( "Ground Beef", 2.50 ) );
 
 }
 
@@ -33,11 +33,11 @@ TEST (PointOfSaleArgumentTest, setConflictingPrices){
     PointOfSale fixed_sale_first;
     PointOfSale weight_sale_first;
     
-    ASSERT_EQ( OK, fixed_sale_first.setItemPrice( "bananas", 2.50 ) );
-    ASSERT_EQ( PRICING_CONFLICT, fixed_sale_first.setPerPoundPrice( "bananas", 4.50 ) );
+    ASSERT_EQ( PointOfSale::OK, fixed_sale_first.setItemPrice( "bananas", 2.50 ) );
+    ASSERT_EQ( PointOfSale::PRICING_CONFLICT, fixed_sale_first.setPerPoundPrice( "bananas", 4.50 ) );
 
-    ASSERT_EQ( OK, weight_sale_first.setPerPoundPrice( "bananas", 4.50 ) );
-    ASSERT_EQ( PRICING_CONFLICT, weight_sale_first.setItemPrice( "bananas", 2.50 ) );
+    ASSERT_EQ( PointOfSale::OK, weight_sale_first.setPerPoundPrice( "bananas", 4.50 ) );
+    ASSERT_EQ( PointOfSale::PRICING_CONFLICT, weight_sale_first.setItemPrice( "bananas", 2.50 ) );
 
 }
 
@@ -46,40 +46,40 @@ TEST (PointOfSaleArgumentTest, setConflictingPrices){
 TEST (PointOfSaleArgumentTest, updateItemPrice){
 
     PointOfSale sale;
-    ASSERT_EQ( OK, sale.setItemPrice( "bananas", 1.89 ) );
-    ASSERT_EQ( OK, sale.setItemPrice( "bananas", 2.50 ) );
+    ASSERT_EQ( PointOfSale::OK, sale.setItemPrice( "bananas", 1.89 ) );
+    ASSERT_EQ( PointOfSale::OK, sale.setItemPrice( "bananas", 2.50 ) );
 
-    ASSERT_EQ( OK, sale.setPerPoundPrice( "Ground Beef", 2.50 ) );
-    ASSERT_EQ( OK, sale.setPerPoundPrice( "Ground Beef", 3.89 ) );
+    ASSERT_EQ( PointOfSale::OK, sale.setPerPoundPrice( "Ground Beef", 2.50 ) );
+    ASSERT_EQ( PointOfSale::OK, sale.setPerPoundPrice( "Ground Beef", 3.89 ) );
 
 }
 
 TEST (PointOfSaleArgumentTest, updateItemPriceAfterItemInCart){
 
     PointOfSale sale;
-    ASSERT_EQ( OK, sale.setItemPrice( "bananas", 1.89 ) );
-    ASSERT_EQ( OK, sale.addFixedPriceItem( "bananas", 2.3 ) );
-    ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, sale.setItemPrice( "bananas", 1.89 ) );
+    ASSERT_EQ( PointOfSale::OK, sale.setItemPrice( "bananas", 1.89 ) );
+    ASSERT_EQ( PointOfSale::OK, sale.addFixedPriceItem( "bananas" ) );
+    ASSERT_EQ( PointOfSale::PRICE_UPDATE_NOT_AVAILABLE, sale.setItemPrice( "bananas", 1.89 ) );
 
-    ASSERT_EQ( OK, sale.setPerPoundPrice( "Ground Beef", 2.50 ) );
-    ASSERT_EQ( OK, sale.addItemWeight( "Ground Beef", 2.3 ) );
-    ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, sale.setPerPoundPrice( "Ground Beef", 3.89 ) );
+    ASSERT_EQ( PointOfSale::OK, sale.setPerPoundPrice( "Ground Beef", 2.50 ) );
+    ASSERT_EQ( PointOfSale::OK, sale.addItemWeight( "Ground Beef", 2.3 ) );
+    ASSERT_EQ( PointOfSale::PRICE_UPDATE_NOT_AVAILABLE, sale.setPerPoundPrice( "Ground Beef", 3.89 ) );
 
 }
 
 TEST (PointOfSaleArgumentTest, setPriceInvalidSku){
 
     PointOfSale sale;
-    ASSERT_EQ( INVALID_SKU, sale.setItemPrice( "", 1.89 ) );
-    ASSERT_EQ( INVALID_SKU, sale.setPerPoundPrice( "", 2.50 ) );
+    ASSERT_EQ( PointOfSale::INVALID_SKU, sale.setItemPrice( "", 1.89 ) );
+    ASSERT_EQ( PointOfSale::INVALID_SKU, sale.setPerPoundPrice( "", 2.50 ) );
 
 }
 
 TEST (PointOfSaleArgumentTest, addItemInvalidSku){
 
     PointOfSale sale;
-    ASSERT_EQ( INVALID_SKU, sale.addFixedPriceItem( "" ) );
-    ASSERT_EQ( INVALID_SKU, sale.addItemWeight( "", 2.50 ) );
+    ASSERT_EQ( PointOfSale::INVALID_SKU, sale.addFixedPriceItem( "" ) );
+    ASSERT_EQ( PointOfSale::INVALID_SKU, sale.addItemWeight( "", 2.50 ) );
 
 }
 
@@ -87,7 +87,7 @@ TEST (PointOfSaleArgumentTest, addItemNegativeWeight){
 
     PointOfSale sale;
     sale.setItemPrice( "bananas", 2.50 );
-    ASSERT_EQ( INVALID_WEIGHT, sale.addItemWeight( "bananas", -1.0 ) );
+    ASSERT_EQ( PointOfSale::INVALID_WEIGHT, sale.addItemWeight( "bananas", -1.0 ) );
 
 }
 
@@ -95,7 +95,7 @@ TEST (PointOfSaleArgumentTest, addItemZeroWeight){
 
     PointOfSale sale;
     sale.setPerPoundPrice( "bananas", 3.50 );
-    ASSERT_EQ( INVALID_WEIGHT, sale.addItemWeight( "bananas", 0.0 ) );
+    ASSERT_EQ( PointOfSale::INVALID_WEIGHT, sale.addItemWeight( "bananas", 0.0 ) );
 
 }
 
@@ -104,10 +104,10 @@ TEST (PointOfSaleArgumentTest, setPriceThenAddItemOfConflictingType){
     PointOfSale fixed_then_weight_sale;
 
     // Set a price as if item is a fixed price
-    ASSERT_EQ( OK, fixed_then_weight_sale.setItemPrice( "bananas", 1.0 ) );
+    ASSERT_EQ( PointOfSale::OK, fixed_then_weight_sale.setItemPrice( "bananas", 1.0 ) );
 
     // attempt to item to cart as if its a weight based item
-    ASSERT_EQ( ITEM_CONFLICT, fixed_then_weight_sale.addItemWeight( "bananas", 1.0 ) );
+    ASSERT_EQ( PointOfSale::ITEM_CONFLICT, fixed_then_weight_sale.addItemWeight( "bananas", 1.0 ) );
 
 }
 
@@ -117,10 +117,10 @@ TEST (PointOfSaleArgumentTest, addItemBeforeSetPrice){
     PointOfSale weight_sale;
 
     // add bananas as if they are fixed price item
-    ASSERT_EQ( NO_PRICE_DEFINED, fixed_sale.addFixedPriceItem( "bananas" ) );
+    ASSERT_EQ( PointOfSale::NO_PRICE_DEFINED, fixed_sale.addFixedPriceItem( "bananas" ) );
 
     // add item as if they are a weight based item
-    ASSERT_EQ( NO_PRICE_DEFINED, weight_sale.addItemWeight( "Ground Beef", 1.0 ) );
+    ASSERT_EQ( PointOfSale::NO_PRICE_DEFINED, weight_sale.addItemWeight( "Ground Beef", 1.0 ) );
 
 }
 
