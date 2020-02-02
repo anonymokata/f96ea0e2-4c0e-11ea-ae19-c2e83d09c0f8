@@ -124,6 +124,48 @@ TEST (PointOfSaleArgumentTest, addItemBeforeSetPrice){
 
 }
 
+TEST_F (PreDefinedPricesFixture, removeItemFromEmptyCart ){
 
+    ASSERT_EQ( PointOfSale::ITEM_NOT_IN_CART, pSale->removeItem( "Cookies" ) );
+    ASSERT_EQ( PointOfSale::ITEM_NOT_IN_CART, pSale->removeItemWeight( "Bananas", 1.0 ) );
+
+}
+
+TEST_F (PreDefinedPricesFixture, removeMoreItemsThanAddedToCart ){
+
+    // add some initial items into the cart
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Cookies" ));
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight("Bananas", 27.0 ));
+
+    // remove the fixed price item from the cart
+    ASSERT_EQ( PointOfSale::OK, pSale->removeItem( "Cookies" ) );
+    ASSERT_EQ( PointOfSale::ITEM_NOT_IN_CART, pSale->removeItem( "Cookies" ) );
+
+    // remove content from the weighted item
+    ASSERT_EQ( PointOfSale::OK, pSale->removeItemWeight( "Bananas", 20.0 ) );
+    ASSERT_EQ( PointOfSale::OK, pSale->removeItemWeight( "Bananas", 5.0 ) );
+    ASSERT_EQ( PointOfSale::ITEM_NOT_IN_CART, pSale->removeItemWeight( "Bananas", 3.0 ) );
+}
+
+TEST_F (PreDefinedPricesFixture, removeItemsInvalidSKU ){
+
+    ASSERT_EQ( PointOfSale::INVALID_SKU, pSale->removeItem( "" ) );
+    ASSERT_EQ( PointOfSale::INVALID_SKU, pSale->removeItemWeight( "", 20.0 ) );
+
+}
+
+TEST_F (PreDefinedPricesFixture, removeItemsConflictingTypes ){
+
+    ASSERT_EQ( PointOfSale::ITEM_CONFLICT, pSale->removeItem( "Bananas" ) );
+    ASSERT_EQ( PointOfSale::ITEM_CONFLICT, pSale->removeItemWeight( "Cookies", 20.0 ) );
+
+}
+
+TEST_F (PreDefinedPricesFixture, removeItemNegativeWeight){
+
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight("Bananas", 5.0));
+    ASSERT_EQ( PointOfSale::INVALID_WEIGHT, pSale->removeItemWeight( "Bananas", -1.0 ));
+
+}
 
 // TODO - Need to add tests covering the removeItem functions

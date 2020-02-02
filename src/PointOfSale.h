@@ -36,10 +36,11 @@ class PointOfSale
         INVALID_PRICE    = 2,           ///< Provided price is invalid
         PRICING_CONFLICT = 3,           ///< Attempted to set a fixed price and per pound price to same item
         PRICE_UPDATE_NOT_AVAILABLE = 4, ///< Price was updated after an item was added to the cart
-        ITEM_CONFLICT    = 5,           ///< Price for SKU configured as Fixed point but item added as Per Pound, or vice versa.
+        ITEM_CONFLICT    = 5,           ///< Price for SKU configured as Fixed point but item added/removed as Per Pound, or vice versa.
         INVALID_SKU      = 6,           ///< An Invalid SKU was provided to the API
         NO_PRICE_DEFINED = 7,           ///< Prices have not been defined for all items in the cart
         INVALID_WEIGHT   = 8,           ///< An invalid weight was provided to the API
+        ITEM_NOT_IN_CART = 9,           ///< Removal of item not allowed without being in cart
     } ReturnCode_t;
 
         PointOfSale();
