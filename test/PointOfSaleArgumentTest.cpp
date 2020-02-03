@@ -167,5 +167,3 @@ TEST_F (PreDefinedPricesFixture, removeItemNegativeWeight){
     ASSERT_EQ( PointOfSale::INVALID_WEIGHT, pSale->removeItemWeight( "Bananas", -1.0 ));
 
 }
-
-// TODO - Need to add tests covering the removeItem functions

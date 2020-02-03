@@ -26,27 +26,72 @@ TEST_F( PreDefinedPricesFixture, MultipleWeightBasedItemsNoRemovals ){
 TEST_F( PreDefinedPricesFixture, MultipleMixedItemsWithDuplicatesNoRemovals ){
 
     // add the fixed price items
-    pSale->addFixedPriceItem("Cookies");
-    pSale->addFixedPriceItem("Milk");
-    pSale->addFixedPriceItem("Soup");
+    pSale->addFixedPriceItem("Cookies");     // 2.26
+    pSale->addFixedPriceItem("Milk");        // 2.53
+    pSale->addFixedPriceItem("Soup");        // 0.98
 
     // add the weight based items
-    pSale->addItemWeight( "Apples", 3.0 );
-    pSale->addItemWeight( "Beef", 2.34 );
-    pSale->addItemWeight( "Bananas", 12.0 );
+    pSale->addItemWeight( "Apples", 3.0 );   // 4.23
+    pSale->addItemWeight( "Beef", 2.34 );    // 8.19
+    pSale->addItemWeight( "Bananas", 12.0 ); // 11.88
 
     // add the same item again to increase amount in cart
-    pSale->addItemWeight( "Apples", 2.3 );
-    pSale->addFixedPriceItem( "Cookies" );
+    pSale->addItemWeight( "Apples", 2.3 );   // 3.24
+    pSale->addFixedPriceItem( "Cookies" );   // 2.26
 
     // add more content of the weight based items to show it increments correctly
-    pSale->addItemWeight( "Beef", 2.34 );
-    pSale->addItemWeight( "Bananas", 12.0 );
+    pSale->addItemWeight( "Beef", 2.34 );    // 8.19
+    pSale->addItemWeight( "Bananas", 12.0 ); // 11.88
 
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 24.30 );
+    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 55.64 );
 }
 
+TEST_F( PreDefinedPricesFixture, fixedPriceItemsWithRemoval ){
 
-// TODO - Add tests mixing fixed and by weight items in single checkout
-// TODO - Add tests associatd with removing items from checkout and ensure correct result is calculated
-// TODO - Add test for removing an item that hasn't been added to the cart
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Cookies" ));
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Cookies" ));
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Cookies" )); // 6.78
+
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Soup" ));
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Soup" )); // 1.96
+
+    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 8.74 );
+
+    ASSERT_EQ( PointOfSale::OK, pSale->removeItem( "Cookies" ));
+    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 6.48 );
+
+    ASSERT_EQ( PointOfSale::OK, pSale->removeItem( "Soup" ));
+    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 5.50 );
+}
+
+TEST_F( PreDefinedPricesFixture, weightBasedItemsWithRemoval ){
+
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Apples", 5.43 )); // 7.65
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Beef", 6.8 ));    // 23.8
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Bananas", 12.2 ));// 12.07
+    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 43.52 );
+
+    ASSERT_EQ( PointOfSale::OK, pSale->removeItemWeight( "Apples", 1.43 )); // 5.64
+    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 41.51 );
+
+    ASSERT_EQ( PointOfSale::OK, pSale->removeItemWeight( "Beef", 5.0 )); // 6.30
+    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 24.01);
+}
+
+TEST_F( PreDefinedPricesFixture, mixedItemsWithRemovals ){
+
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Cookies" ));
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Cookies" ));
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Cookies" )); // 6.78
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Soup" ));
+    ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Soup" )); // 1.96
+
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Apples", 5.43 )); // 7.65
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Beef", 6.8 ));    // 23.8
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Bananas", 12.2 ));// 12.07
+    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 52.26 );
+
+    ASSERT_EQ( PointOfSale::OK, pSale->removeItem( "Cookies" ));
+    ASSERT_EQ( PointOfSale::OK, pSale->removeItemWeight( "Apples", 1.43 )); // 5.64
+    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 47.99);
+}
