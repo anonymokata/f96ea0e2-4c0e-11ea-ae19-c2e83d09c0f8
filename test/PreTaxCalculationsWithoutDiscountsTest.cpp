@@ -12,7 +12,7 @@ TEST_F( PreDefinedPricesFixture, MultipleFixedPriceItemsNoRemovals ){
     }
 
     pSale->addFixedPriceItem( "Cookies" );
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 5.20 );
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 5.20, 0.01 );
 }
 
 TEST_F( PreDefinedPricesFixture, MultipleWeightBasedItemsNoRemovals ){
@@ -20,7 +20,7 @@ TEST_F( PreDefinedPricesFixture, MultipleWeightBasedItemsNoRemovals ){
     pSale->addItemWeight( "Apples", 3.0 );
     pSale->addItemWeight( "Beef", 2.34 );
     pSale->addItemWeight( "Bananas", 12.0 );
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 24.30 );
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 24.30, .01 );
 }
 
 TEST_F( PreDefinedPricesFixture, MultipleMixedItemsWithDuplicatesNoRemovals ){
@@ -43,7 +43,7 @@ TEST_F( PreDefinedPricesFixture, MultipleMixedItemsWithDuplicatesNoRemovals ){
     pSale->addItemWeight( "Beef", 2.34 );    // 8.19
     pSale->addItemWeight( "Bananas", 12.0 ); // 11.88
 
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 55.64 );
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 55.64, .01 );
 }
 
 TEST_F( PreDefinedPricesFixture, fixedPriceItemsWithRemoval ){
@@ -55,13 +55,13 @@ TEST_F( PreDefinedPricesFixture, fixedPriceItemsWithRemoval ){
     ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Soup" ));
     ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Soup" )); // 1.96
 
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 8.74 );
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 8.74, .01 );
 
     ASSERT_EQ( PointOfSale::OK, pSale->removeItem( "Cookies" ));
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 6.48 );
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 6.48, .01 );
 
     ASSERT_EQ( PointOfSale::OK, pSale->removeItem( "Soup" ));
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 5.50 );
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 5.50, .01 );
 }
 
 TEST_F( PreDefinedPricesFixture, weightBasedItemsWithRemoval ){
@@ -69,13 +69,13 @@ TEST_F( PreDefinedPricesFixture, weightBasedItemsWithRemoval ){
     ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Apples", 5.43 )); // 7.65
     ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Beef", 6.8 ));    // 23.8
     ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Bananas", 12.2 ));// 12.07
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 43.52 );
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 43.52, .01 );
 
     ASSERT_EQ( PointOfSale::OK, pSale->removeItemWeight( "Apples", 1.43 )); // 5.64
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 41.51 );
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 41.51, .01 );
 
     ASSERT_EQ( PointOfSale::OK, pSale->removeItemWeight( "Beef", 5.0 )); // 6.30
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 24.01);
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 24.01, .01);
 }
 
 TEST_F( PreDefinedPricesFixture, mixedItemsWithRemovals ){
@@ -89,9 +89,9 @@ TEST_F( PreDefinedPricesFixture, mixedItemsWithRemovals ){
     ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Apples", 5.43 )); // 7.65
     ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Beef", 6.8 ));    // 23.8
     ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Bananas", 12.2 ));// 12.07
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 52.26 );
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 52.26, .01 );
 
     ASSERT_EQ( PointOfSale::OK, pSale->removeItem( "Cookies" ));
     ASSERT_EQ( PointOfSale::OK, pSale->removeItemWeight( "Apples", 1.43 )); // 5.64
-    ASSERT_DOUBLE_EQ( pSale->getPreTaxTotal(), 47.99);
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 47.99, .01);
 }

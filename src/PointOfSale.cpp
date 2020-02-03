@@ -239,5 +239,38 @@ PointOfSale::ReturnCode_t PointOfSale::removeItemWeight( std::string sku, double
 
 double PointOfSale::getPreTaxTotal()
 {
-    return 0;
+    double total = 0.0;
+    map<string, int>::iterator fixed_cart_it;
+    map<string, double>::iterator weight_cart_it;
+    map<string, double>::iterator price_it;
+
+    // calculate totals for each of the fixed price items in cart
+    fixed_cart_it = fixed_price_cart.begin();
+    while( fixed_cart_it != fixed_price_cart.end() )
+    {
+        // retrieve iterator for looking up the price of the item
+        price_it = fixed_prices.find(fixed_cart_it->first);
+
+        // compute the cost for this fixed price item based on configured price and number items
+        total += (fixed_cart_it->second * price_it->second);
+
+        // update the progress of the iterator so that next item can be processed
+        fixed_cart_it++;
+    }
+
+    // calculate totals for each of the weight based items in cart
+    weight_cart_it = weight_cart.begin();
+    while ( weight_cart_it != weight_cart.end() )
+    {
+        // retrieve iterator to lookup the price per pound for the item
+        price_it = weight_prices.find(weight_cart_it->first);
+
+        // compute the cost for the weighted items
+        total += (weight_cart_it->second * price_it->second);
+
+        // increment the iterator to walk through the cart
+        weight_cart_it++;
+    }
+
+    return total;
 }
