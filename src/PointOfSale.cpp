@@ -14,6 +14,9 @@ PointOfSale::~PointOfSale()
 
 PointOfSale::ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
 {
+    map<string,int>::iterator it;
+    map<string,double>::iterator it_db;
+
     if(price <= 0.0)
     {
         return INVALID_PRICE;
@@ -25,8 +28,15 @@ PointOfSale::ReturnCode_t PointOfSale::setItemPrice( std::string sku, double pri
     }
 
     // check to see if price for this sku has already been added as a weight based item
-    map<string,double>::iterator it = weight_prices.find(sku);
-    if(it != weight_prices.end())
+    it = fixed_price_cart.find(sku);
+    if(it != fixed_price_cart.end())
+    {
+        return PRICE_UPDATE_NOT_AVAILABLE;
+    }
+
+    // check to see if price for this sku has already been added as a weight based item
+    it_db = weight_prices.find(sku);
+    if(it_db != weight_prices.end())
     {
         return PRICING_CONFLICT;
     }
@@ -39,6 +49,8 @@ PointOfSale::ReturnCode_t PointOfSale::setItemPrice( std::string sku, double pri
 
 PointOfSale::ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
 {
+    map<string,double>::iterator it;
+
     if(price <= 0.0)
     {
         return INVALID_PRICE;
@@ -49,8 +61,14 @@ PointOfSale::ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double
         return INVALID_SKU;
     }
 
+    it = weight_cart.find(sku);
+    if(it != weight_cart.end())
+    {
+        return PRICE_UPDATE_NOT_AVAILABLE;
+    }
+
     // check to see if price for this sku has already been added as a weight based item
-    map<string,double>::iterator it = fixed_prices.find(sku);
+    it = fixed_prices.find(sku);
     if(it != fixed_prices.end())
     {
         return PRICING_CONFLICT;
@@ -64,30 +82,47 @@ PointOfSale::ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double
 
 PointOfSale::ReturnCode_t PointOfSale::addFixedPriceItem( std::string sku )
 {
+    map<string,int>::iterator it;
+    map<string,double>::iterator it_db;
+
     if(sku.length() == 0)
     {
         return INVALID_SKU;
     }
 
     // check to see if price for this sku has already been added as a weight based item
-    map<string,double>::iterator it = weight_prices.find(sku);
-    if(it != weight_prices.end())
+    it_db = weight_prices.find(sku);
+    if(it_db != weight_prices.end())
     {
         return ITEM_CONFLICT;
     }
 
     // Check to see that a price has been configured for this item
-    it = fixed_prices.find(sku);
-    if(it == fixed_prices.end())
+    it_db = fixed_prices.find(sku);
+    if(it_db == fixed_prices.end())
     {
         return NO_PRICE_DEFINED;
     }
+
+    // check to see if item already in cart
+    it = fixed_price_cart.find(sku);
+    if(it == fixed_price_cart.end())
+    {
+        // if not in cart then it needs to be added with zero items so that 
+        // following code works regardless of current state of map
+        fixed_price_cart[sku] = 0;
+    }
+
+    // increment the count of the item within the cart for fixed price items
+    fixed_price_cart[sku] += 1;
 
     return OK;
 }
 
 PointOfSale::ReturnCode_t PointOfSale::addItemWeight( std::string sku, double pounds )
 {
+    map<string,double>::iterator it;
+
     if(sku.length() == 0)
     {
         return INVALID_SKU;
@@ -99,7 +134,7 @@ PointOfSale::ReturnCode_t PointOfSale::addItemWeight( std::string sku, double po
     }
 
     // check to see if price for this sku has already been added as a weight based item
-    map<string,double>::iterator it = fixed_prices.find(sku);
+    it = fixed_prices.find(sku);
     if(it != fixed_prices.end())
     {
         return ITEM_CONFLICT;
@@ -112,17 +147,94 @@ PointOfSale::ReturnCode_t PointOfSale::addItemWeight( std::string sku, double po
         return NO_PRICE_DEFINED;
     }
 
+    // check the cart to see if items of this type have already been added. If not, the itemm within the cart
+    // should be initialized to zero. This allows the following code to work regardless of whether this is the
+    // first time adding the weight based item as well as if its a repeat. 
+    it = weight_cart.find(sku);
+    if(it == weight_cart.end())
+    {
+        weight_cart[sku] = 0.0;
+    }
+
+    // increment the count for the given item in the cart
+    weight_cart[sku] += pounds;
+
     return OK;
 }
 
 PointOfSale::ReturnCode_t PointOfSale::removeItem( std::string sku )
 {
-    return ERROR;
+    map<string, int>::iterator it;
+    map<string, double>::iterator it_db;
+
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+
+    it_db = weight_prices.find(sku);
+    if(it_db != weight_prices.end())
+    {
+        return ITEM_CONFLICT;
+    }
+
+    // verify that items of this type have been added to the cart in the past
+    it = fixed_price_cart.find(sku);
+    if(it == fixed_price_cart.end())
+    {
+        return ITEM_NOT_IN_CART;
+    }
+
+    // decrement the item count in the cart and erase the item from the cart
+    // entirely if there are no current items.
+    it->second -= 1;
+    if(it->second == 0)
+    {
+        fixed_price_cart.erase(it);
+    }
+
+    return OK;
 }
 
 PointOfSale::ReturnCode_t PointOfSale::removeItemWeight( std::string sku, double pounds )
 {
-    return ERROR;
+    map<string, double>::iterator it;
+
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+
+    if(pounds <= 0)
+    {
+        return INVALID_WEIGHT;
+    }
+
+    it = fixed_prices.find(sku);
+    if(it != fixed_prices.end())
+    {
+        return ITEM_CONFLICT;
+    }
+
+    // verify that items of this type have been added to the cart in the past
+    it = weight_cart.find(sku);
+    if(it == weight_cart.end())
+    {
+        return ITEM_NOT_IN_CART;
+    }
+
+    if(pounds > it->second)
+    {
+        return ITEM_NOT_IN_CART;
+    }
+
+    it->second -= pounds;
+    if(it->second == 0.0)
+    {
+        weight_cart.erase(it);
+    }
+
+    return OK;
 }
 
 double PointOfSale::getPreTaxTotal()
