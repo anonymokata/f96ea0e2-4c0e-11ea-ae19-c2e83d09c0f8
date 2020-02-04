@@ -75,6 +75,17 @@ class PointOfSale
         /// \param price The price per pound of the unit being added to the cart
         ReturnCode_t setPerPoundPrice( std::string sku, double price );
 
+        /// \fn setMarkdown
+        /// \brief Provides ability to enable a marked down price on an item
+        ///
+        /// The PointOfSale system supports the ability to register an item with a marked down price. In this situation,
+        /// the price of a fixed price item will be reduced by the amount. For a weight based item, the markdown
+        /// price will be applied to each pound of the iem that is sold.
+        ///
+        /// \param sku Represents the itemt hat is being added
+        /// \param price Amount of discount to apply to the item
+        ReturnCode_t setMarkdown( std::string sku, double price );
+
         /// \fn addFixedPriceItem
         /// \brief Adds a fixed price item to the shopping cart
         ///

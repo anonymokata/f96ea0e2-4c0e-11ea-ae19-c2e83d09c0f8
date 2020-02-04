@@ -274,3 +274,8 @@ double PointOfSale::getPreTaxTotal()
 
     return total;
 }
+
+PointOfSale::ReturnCode_t PointOfSale::setMarkdown( std::string sku, double price )
+{
+    return ERROR;
+}
