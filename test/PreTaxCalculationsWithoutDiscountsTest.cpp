@@ -66,10 +66,10 @@ TEST_F( PreDefinedPricesFixture, fixedPriceItemsWithRemoval ){
 
 TEST_F( PreDefinedPricesFixture, weightBasedItemsWithRemoval ){
 
-    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Apples", 5.43 )); // 7.65
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Apples", 5.43 )); // 7.66
     ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Beef", 6.8 ));    // 23.8
-    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Bananas", 12.2 ));// 12.07
-    ASSERT_NEAR( pSale->getPreTaxTotal(), 43.52, .01 );
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Bananas", 12.2 ));// 12.08
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 43.54, .01 );
 
     ASSERT_EQ( PointOfSale::OK, pSale->removeItemWeight( "Apples", 1.43 )); // 5.64
     ASSERT_NEAR( pSale->getPreTaxTotal(), 41.51, .01 );
@@ -86,10 +86,10 @@ TEST_F( PreDefinedPricesFixture, mixedItemsWithRemovals ){
     ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Soup" ));
     ASSERT_EQ( PointOfSale::OK, pSale->addFixedPriceItem( "Soup" )); // 1.96
 
-    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Apples", 5.43 )); // 7.65
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Apples", 5.43 )); // 7.66
     ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Beef", 6.8 ));    // 23.8
-    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Bananas", 12.2 ));// 12.07
-    ASSERT_NEAR( pSale->getPreTaxTotal(), 52.26, .01 );
+    ASSERT_EQ( PointOfSale::OK, pSale->addItemWeight( "Bananas", 12.2 ));// 12.08
+    ASSERT_NEAR( pSale->getPreTaxTotal(), 52.28, .01 );
 
     ASSERT_EQ( PointOfSale::OK, pSale->removeItem( "Cookies" ));
     ASSERT_EQ( PointOfSale::OK, pSale->removeItemWeight( "Apples", 1.43 )); // 5.64
