@@ -1,5 +1,6 @@
 #include <string>
 
+#include "Types.h"
 #include "PointOfSale.h"
 
 PointOfSale::PointOfSale()
@@ -12,7 +13,7 @@ PointOfSale::~PointOfSale()
     
 }
 
-PointOfSale::ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
+ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
 {
     map<string,int>::iterator it;
     map<string,double>::iterator it_db;
@@ -47,7 +48,7 @@ PointOfSale::ReturnCode_t PointOfSale::setItemPrice( std::string sku, double pri
     return OK;
 }
 
-PointOfSale::ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
+ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
 {
     map<string,double>::iterator it;
 
@@ -80,7 +81,7 @@ PointOfSale::ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double
     return OK;
 }
 
-PointOfSale::ReturnCode_t PointOfSale::addFixedPriceItem( std::string sku )
+ReturnCode_t PointOfSale::addFixedPriceItem( std::string sku )
 {
     map<string,int>::iterator it;
     map<string,double>::iterator it_db;
@@ -119,7 +120,7 @@ PointOfSale::ReturnCode_t PointOfSale::addFixedPriceItem( std::string sku )
     return OK;
 }
 
-PointOfSale::ReturnCode_t PointOfSale::addItemWeight( std::string sku, double pounds )
+ReturnCode_t PointOfSale::addItemWeight( std::string sku, double pounds )
 {
     map<string,double>::iterator it;
 
@@ -162,7 +163,7 @@ PointOfSale::ReturnCode_t PointOfSale::addItemWeight( std::string sku, double po
     return OK;
 }
 
-PointOfSale::ReturnCode_t PointOfSale::removeItem( std::string sku )
+ReturnCode_t PointOfSale::removeItem( std::string sku )
 {
     map<string, int>::iterator it;
     map<string, double>::iterator it_db;
@@ -196,7 +197,7 @@ PointOfSale::ReturnCode_t PointOfSale::removeItem( std::string sku )
     return OK;
 }
 
-PointOfSale::ReturnCode_t PointOfSale::removeItemWeight( std::string sku, double pounds )
+ReturnCode_t PointOfSale::removeItemWeight( std::string sku, double pounds )
 {
     map<string, double>::iterator it;
 
@@ -275,7 +276,7 @@ double PointOfSale::getPreTaxTotal()
     return total;
 }
 
-PointOfSale::ReturnCode_t PointOfSale::setMarkdown( std::string sku, double price )
+ReturnCode_t PointOfSale::setMarkdown( std::string sku, double price )
 {
     return ERROR;
 }
