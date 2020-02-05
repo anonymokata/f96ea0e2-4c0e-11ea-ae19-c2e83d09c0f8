@@ -39,7 +39,7 @@ TEST_F (MarkdownTestFixture, setMarkdownNegativePrice){
 
 TEST_F (MarkdownTestFixture, settingMarkdownBeforePrice){
 
-    ASSERT_EQ( NO_PRICE_DEFINED, pSale->setMarkdown( "Bananas", 0.2));
+    ASSERT_EQ( NO_PRICE_DEFINED, pSale->setMarkdown( "Steak", 0.2));
 }
 
 TEST_F (MarkdownTestFixture, setMarkdownTooLargeMarkdown){

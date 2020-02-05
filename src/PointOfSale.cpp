@@ -241,9 +241,11 @@ ReturnCode_t PointOfSale::removeItemWeight( std::string sku, double pounds )
 double PointOfSale::getPreTaxTotal()
 {
     double total = 0.0;
+    double price = 0.0;
     map<string, int>::iterator fixed_cart_it;
     map<string, double>::iterator weight_cart_it;
     map<string, double>::iterator price_it;
+    map<string, double>::iterator markdown_it;
 
     // calculate totals for each of the fixed price items in cart
     fixed_cart_it = fixed_price_cart.begin();
@@ -251,9 +253,17 @@ double PointOfSale::getPreTaxTotal()
     {
         // retrieve iterator for looking up the price of the item
         price_it = fixed_prices.find(fixed_cart_it->first);
+        price = price_it->second;
+
+        // if a markdown has been configured then it needs to be applied
+        markdown_it = markdowns.find(fixed_cart_it->first);
+        if(markdown_it != markdowns.end())
+        {
+            price = price - markdown_it->second;
+        }
 
         // compute the cost for this fixed price item based on configured price and number items
-        total += (fixed_cart_it->second * price_it->second);
+        total += (fixed_cart_it->second * price);
 
         // update the progress of the iterator so that next item can be processed
         fixed_cart_it++;
@@ -265,9 +275,17 @@ double PointOfSale::getPreTaxTotal()
     {
         // retrieve iterator to lookup the price per pound for the item
         price_it = weight_prices.find(weight_cart_it->first);
+        price = price_it->second;
+
+        // if a markdown has been configured then it needs to be applied
+        markdown_it = markdowns.find(weight_cart_it->first);
+        if(markdown_it != markdowns.end())
+        {
+            price = price - markdown_it->second;
+        }
 
         // compute the cost for the weighted items
-        total += (weight_cart_it->second * price_it->second);
+        total += (weight_cart_it->second * price);
 
         // increment the iterator to walk through the cart
         weight_cart_it++;
@@ -278,5 +296,47 @@ double PointOfSale::getPreTaxTotal()
 
 ReturnCode_t PointOfSale::setMarkdown( std::string sku, double price )
 {
-    return ERROR;
+    map<string, int>::iterator it;
+    map<string, double>::iterator fixed_it;
+    map<string, double>::iterator weight_it;
+
+    if(price < 0)
+    {
+        return INVALID_PRICE;
+    }
+
+    // search the price maps for the given item and retrieve iterators
+    fixed_it  = fixed_prices.find(sku);
+    weight_it = weight_prices.find(sku);
+
+    // check to see if price defined in fixed
+    if(fixed_it == fixed_prices.end() && 
+      weight_it == weight_prices.end())
+    {
+        return NO_PRICE_DEFINED;
+    }
+
+    // check and see if the provided markdown was too large
+    if(fixed_it != fixed_prices.end() && fixed_it->second < price)
+    {
+        return INVALID_PRICE;
+    }
+    else if(weight_it != weight_prices.end() && weight_it->second < price)
+    {
+        return INVALID_PRICE;
+    }
+
+    // check to see if an item has been placed in the cart. If so, then updates to
+    // to the markdown are not allowed per writeup
+    it = fixed_price_cart.find(sku);
+    weight_it = weight_cart.find(sku);
+    if(it != fixed_price_cart.end() || weight_it != weight_cart.end())
+    {
+        return PRICE_UPDATE_NOT_AVAILABLE;
+    }
+
+    // save the provided price into the map that keeps track of the markdown amounts
+    markdowns[sku] = price;
+
+    return OK;
 }

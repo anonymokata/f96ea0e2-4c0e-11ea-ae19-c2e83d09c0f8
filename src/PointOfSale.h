@@ -132,6 +132,8 @@ class PointOfSale
         map<string, int> fixed_price_cart; // track the number of items for each SKU that have been added to the cart
         map<string, double> weight_cart;   // track the number of pounds for the SKU's that are currently in the cart
 
+        map<string, double> markdowns;      // keep track of the markdowns that have been programmed
+
 };
 
 #endif
