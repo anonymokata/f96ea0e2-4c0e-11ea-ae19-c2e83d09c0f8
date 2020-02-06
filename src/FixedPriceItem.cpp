@@ -59,11 +59,16 @@ ReturnCode_t FixedPriceItem::applyMarkdown( double amount )
     return OK;
 }
 
-ReturnCode_t FixedPriceItem::addToCart( unsigned int amount )
+ReturnCode_t FixedPriceItem::addToCart( int amount )
 {
     if(!is_price_set)
     {
         return NO_PRICE_DEFINED;
+    }
+
+    if(amount < 0)
+    {
+        return ERROR;
     }
 
     count_in_cart += amount;
@@ -71,12 +76,17 @@ ReturnCode_t FixedPriceItem::addToCart( unsigned int amount )
     return OK;
 }
 
-ReturnCode_t FixedPriceItem::removeFromCart( unsigned int amount )
+ReturnCode_t FixedPriceItem::removeFromCart( int amount )
 {
 
     if(count_in_cart < amount || count_in_cart == 0)
     {
         return ITEM_NOT_IN_CART;
+    }
+
+    if(amount < 0)
+    {
+        return ERROR;
     }
 
     count_in_cart -= amount;

@@ -1,36 +1,36 @@
 #include "gtest/gtest.h"
-#include "FixedPriceItem.h"
+#include "WeightBasedItem.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           setPrice Verification
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST (FixedPriceItemTest, setNegativePrice){
+TEST (WeightBasedItemTest, setNegativePrice){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( INVALID_PRICE, item.setPrice( -1.0 ) );
 
 }
 
-TEST (FixedPriceItemTest, setZeroPrice){
+TEST (WeightBasedItemTest, setZeroPrice){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( INVALID_PRICE, item.setPrice( 0.0 ) );
 
 }
 
-TEST (FixedPriceItemTest, updatePriceAfterAddingToCart){
+TEST (WeightBasedItemTest, updatePriceAfterAddingToCart){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice(2.3) );
-    ASSERT_EQ( OK, item.addToCart( 2 ) );
+    ASSERT_EQ( OK, item.addToCart( 2.0 ) );
     ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, item.setPrice(2.2) );
 
 }
 
-TEST (FixedPriceItemTest, multipleSetPriceUpdates){
+TEST (WeightBasedItemTest, multipleSetPriceUpdates){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice(2.3) );
     ASSERT_EQ( OK, item.setPrice(2.2) );
 
@@ -40,33 +40,33 @@ TEST (FixedPriceItemTest, multipleSetPriceUpdates){
 //                           MARKDOWN Verification
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST (FixedPriceItemTest, applyMarkdownAfterItemInCart){
+TEST (WeightBasedItemTest, applyMarkdownAfterItemInCart){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice(2.4));
-    ASSERT_EQ( OK, item.addToCart( 4 ));
+    ASSERT_EQ( OK, item.addToCart( 4.1 ));
     ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, item.applyMarkdown(0.2) );
 
 }
 
-TEST (FixedPriceItemTest, applyMarkdownBeforePrice){
+TEST (WeightBasedItemTest, applyMarkdownBeforePrice){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( NO_PRICE_DEFINED, item.applyMarkdown(0.2) );
 
 }
 
-TEST (FixedPriceItemTest, applyTooBigOfMarkdown){
+TEST (WeightBasedItemTest, applyTooBigOfMarkdown){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
     ASSERT_EQ( PRICING_CONFLICT, item.applyMarkdown(1.2) );
 
 }
 
-TEST (FixedPriceItemTest, negativeMarkdown){
+TEST (WeightBasedItemTest, negativeMarkdown){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
     ASSERT_EQ( PRICING_CONFLICT, item.applyMarkdown(-1.0) );
 
@@ -76,21 +76,12 @@ TEST (FixedPriceItemTest, negativeMarkdown){
 //                           AddToCart Verification
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST (FixedPriceItemTest, addToCartBeforePriceConfigured){
+TEST (WeightBasedItemTest, addToCartBeforePriceConfigured){
 
-    FixedPriceItem item;
-    ASSERT_EQ( NO_PRICE_DEFINED, item.addToCart( 1 ) );
+    WeightBasedItem item;
+    ASSERT_EQ( NO_PRICE_DEFINED, item.addToCart( 1.0 ) );
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( OK, item.addToCart( 1 ) );
-
-}
-
-TEST (FixedPriceItemTest, addToCartNegative){
-
-    FixedPriceItem item;
-    
-    ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( ERROR, item.addToCart( -1 ) );
+    ASSERT_EQ( OK, item.addToCart( 1.0 ) );
 
 }
 
@@ -98,38 +89,29 @@ TEST (FixedPriceItemTest, addToCartNegative){
 //                           RemoveFromCart Verification
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST (FixedPriceItemTest, removeFromCartBeforeInCart){
+TEST (WeightBasedItemTest, removeFromCartBeforeInCart){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( ITEM_NOT_IN_CART, item.removeFromCart( 1 ) );
+    ASSERT_EQ( ITEM_NOT_IN_CART, item.removeFromCart( 1.0 ) );
 
 }
 
-TEST (FixedPriceItemTest, removeMoreThanInCart){
+TEST (WeightBasedItemTest, removeMoreThanInCart){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( OK, item.addToCart( 4 ) );
-    ASSERT_EQ( ITEM_NOT_IN_CART, item.removeFromCart( 6 ) );
+    ASSERT_EQ( OK, item.addToCart( 4.0 ) );
+    ASSERT_EQ( ITEM_NOT_IN_CART, item.removeFromCart( 6.0 ) );
 
 }
 
-TEST (FixedPriceItemTest, removeItemFromCart){
+TEST (WeightBasedItemTest, removeItemFromCart){
 
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( OK, item.addToCart( 3 ) );
+    ASSERT_EQ( OK, item.addToCart( 3.1 ) );
     ASSERT_EQ( OK, item.removeFromCart( 1 ) );
-
-}
-
-TEST (FixedPriceItemTest, removeItemFromCartNegativeAmount){
-
-    FixedPriceItem item;
-    ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( OK, item.addToCart( 3 ) );
-    ASSERT_EQ( ERROR, item.removeFromCart( -1 ) );
 
 }
 
@@ -137,42 +119,42 @@ TEST (FixedPriceItemTest, removeItemFromCartNegativeAmount){
 //                           Compute Pre-Tax Verification
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST (FixedPriceItemTest, computeTaxWithoutPrice){
+TEST (WeightBasedItemTest, computeTaxWithoutPrice){
 
     double tax = 0;
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( NO_PRICE_DEFINED, item.computePreTax( &tax ) );
 
 }
 
-TEST (FixedPriceItemTest, computeTaxNoItemsInCarts){
+TEST (WeightBasedItemTest, computeTaxNoItemsInCarts){
 
     double tax = 0;
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.computePreTax( &tax ) );
     ASSERT_NEAR( tax, 0.0, .01 );
 
 }
 
-TEST (FixedPriceItemTest, computeTaxNoMarkdown){
+TEST (WeightBasedItemTest, computeTaxNoMarkdown){
 
     double tax = 0;
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice(3.4));
-    ASSERT_EQ( OK, item.addToCart(3));
+    ASSERT_EQ( OK, item.addToCart(3.0));
     ASSERT_EQ( OK, item.computePreTax( &tax ) );
     ASSERT_NEAR( tax, 10.2, .01 );
 
 }
 
-TEST (FixedPriceItemTest, computeTaxWithMarkdown){
+TEST (WeightBasedItemTest, computeTaxWithMarkdown){
 
     double tax = 0;
-    FixedPriceItem item;
+    WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown(0.4));
-    ASSERT_EQ( OK, item.addToCart(3));
+    ASSERT_EQ( OK, item.addToCart(3.0));
     ASSERT_EQ( OK, item.computePreTax( &tax ) );
     ASSERT_NEAR( tax, 9.0, .01 );
 

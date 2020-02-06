@@ -16,8 +16,8 @@ class FixedPriceItem
         // ReturnCode_t applyDiscount();
         ReturnCode_t computePreTax( double *pTaxAmount );
 
-        ReturnCode_t addToCart( unsigned int amount );
-        ReturnCode_t removeFromCart( unsigned int amount );
+        ReturnCode_t addToCart( int amount );
+        ReturnCode_t removeFromCart( int amount );
 
     protected:
         double price;
@@ -27,7 +27,7 @@ class FixedPriceItem
         bool is_markdown_set;
 
     private:
-        unsigned int count_in_cart;
+        int count_in_cart;
 
 };
 
