@@ -74,7 +74,12 @@ ReturnCode_t FixedPriceItem::addToCart( unsigned int amount )
 ReturnCode_t FixedPriceItem::removeFromCart( unsigned int amount )
 {
 
+    if(count_in_cart < amount || count_in_cart == 0)
+    {
+        return ITEM_NOT_IN_CART;
+    }
 
+    count_in_cart -= amount;
 
-    return ERROR;
+    return OK;
 }

@@ -105,3 +105,12 @@ TEST (FixedPriceItemTest, removeMoreThanInCart){
     ASSERT_EQ( ITEM_NOT_IN_CART, item.removeFromCart( 6 ) );
 
 }
+
+TEST (FixedPriceItemTest, removeItemFromCart){
+
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice( 1.0 ) );
+    ASSERT_EQ( OK, item.addToCart( 3 ) );
+    ASSERT_EQ( OK, item.removeFromCart( 1 ) );
+
+}
