@@ -2,19 +2,18 @@
 #define WEIGHT_BASED_ITEM_H
 
 #include "Types.h"
-#include "FixedPriceItem.h"
+#include "Item.h"
 
-class WeightBasedItem : public FixedPriceItem
+class WeightBasedItem : public Item
 {
 
     public:
         WeightBasedItem();
         ~WeightBasedItem();
 
-        ReturnCode_t addToCart( int weight );
-        ReturnCode_t addToCart( double weight );
+        ReturnCode_t computePreTax( double *pTaxAmount );
 
-        ReturnCode_t removeFromCart( int weight );
+        ReturnCode_t addToCart( double weight );
         ReturnCode_t removeFromCart( double weight );
 
     protected:

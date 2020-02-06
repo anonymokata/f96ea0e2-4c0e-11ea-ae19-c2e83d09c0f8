@@ -2,8 +2,9 @@
 #define FIXED_PRICE_ITEM_H
 
 #include "Types.h"
+#include "Item.h"
 
-class FixedPriceItem
+class FixedPriceItem : public Item
 {
 
     public:
@@ -11,20 +12,12 @@ class FixedPriceItem
         FixedPriceItem();
         ~FixedPriceItem();
 
-        ReturnCode_t setPrice( double price );
-        ReturnCode_t applyMarkdown( double amount );
-        // ReturnCode_t applyDiscount();
-        ReturnCode_t computePreTax( double *pTaxAmount );
-
         ReturnCode_t addToCart( int amount );
         ReturnCode_t removeFromCart( int amount );
 
-    protected:
-        double price;
-        bool is_price_set;
+        ReturnCode_t computePreTax( double *pTaxAmount );
 
-        double markdown;
-        bool is_markdown_set;
+    protected:
 
     private:
         int count_in_cart;
