@@ -114,3 +114,48 @@ TEST (FixedPriceItemTest, removeItemFromCart){
     ASSERT_EQ( OK, item.removeFromCart( 1 ) );
 
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//                           Compute Pre-Tax Verification
+///////////////////////////////////////////////////////////////////////////////
+
+TEST (FixedPriceItemTest, computeTaxWithoutPrice){
+
+    double tax = 0;
+    FixedPriceItem item;
+    ASSERT_EQ( NO_PRICE_DEFINED, item.computePreTax( &tax ) );
+
+}
+
+TEST (FixedPriceItemTest, computeTaxNoItemsInCarts){
+
+    double tax = 0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.computePreTax( &tax ) );
+    ASSERT_NEAR( tax, 0.0, .01 );
+
+}
+
+TEST (FixedPriceItemTest, computeTaxNoMarkdown){
+
+    double tax = 0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.addToCart(3));
+    ASSERT_EQ( OK, item.computePreTax( &tax ) );
+    ASSERT_NEAR( tax, 10.2, .01 );
+
+}
+
+TEST (FixedPriceItemTest, computeTaxWithMarkdown){
+
+    double tax = 0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown(0.4));
+    ASSERT_EQ( OK, item.addToCart(3));
+    ASSERT_EQ( OK, item.computePreTax( &tax ) );
+    ASSERT_NEAR( tax, 9.0, .01 );
+
+}

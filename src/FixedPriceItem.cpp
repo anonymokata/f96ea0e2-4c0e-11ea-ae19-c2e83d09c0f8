@@ -83,3 +83,21 @@ ReturnCode_t FixedPriceItem::removeFromCart( unsigned int amount )
 
     return OK;
 }
+
+ReturnCode_t FixedPriceItem::computePreTax( double *pTaxAmount )
+{
+    if(!is_price_set)
+    {
+        return NO_PRICE_DEFINED;
+    }
+
+    double cost = price;
+    if(is_markdown_set)
+    {
+        cost -= markdown;
+    }
+
+    *pTaxAmount = cost * count_in_cart;
+
+    return OK;
+}

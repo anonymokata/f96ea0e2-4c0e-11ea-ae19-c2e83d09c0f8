@@ -14,6 +14,7 @@ class FixedPriceItem
         ReturnCode_t setPrice( double price );
         ReturnCode_t applyMarkdown( double amount );
         // ReturnCode_t applyDiscount();
+        ReturnCode_t computePreTax( double *pTaxAmount );
 
         ReturnCode_t addToCart( unsigned int amount );
         ReturnCode_t removeFromCart( unsigned int amount );
