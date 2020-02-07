@@ -13,7 +13,7 @@ class FixedPriceItem
 
         ReturnCode_t setPrice( double price );
         ReturnCode_t applyMarkdown( double amount );
-        // ReturnCode_t applyDiscount(...);
+        ReturnCode_t applyDiscount( int buy_x, int get_y, double percent_off );
 
         ReturnCode_t addToCart( int amount );
         ReturnCode_t removeFromCart( int amount );

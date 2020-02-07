@@ -55,6 +55,10 @@ ReturnCode_t FixedPriceItem::applyMarkdown( double amount )
     return OK;
 }
 
+ReturnCode_t FixedPriceItem::applyDiscount( int buy_x, int get_y, double percent_off )
+{
+    return ERROR;
+}
 
 ReturnCode_t FixedPriceItem::addToCart( int amount )
 {

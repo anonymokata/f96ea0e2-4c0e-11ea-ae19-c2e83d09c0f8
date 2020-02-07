@@ -19,6 +19,7 @@ typedef enum
     NO_PRICE_DEFINED = 7,           ///< Prices have not been defined for all items in the cart
     INVALID_WEIGHT   = 8,           ///< An invalid weight was provided to the API
     ITEM_NOT_IN_CART = 9,           ///< Removal of item not allowed without being in cart
+    INVALID_DISCOUNT = 10,
 } ReturnCode_t;
 
 #endif

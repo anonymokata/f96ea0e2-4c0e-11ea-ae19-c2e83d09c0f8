@@ -177,3 +177,77 @@ TEST (FixedPriceItemTest, computeTaxWithMarkdown){
     ASSERT_NEAR( tax, 9.0, .01 );
 
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//                           Discount Verification
+///////////////////////////////////////////////////////////////////////////////
+
+TEST (FixedPriceItemTest, buyNGetMOffNegativeValues){
+
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( -1, 2, .5 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 4, -4, .5 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 2, 2, -.5 ) );
+
+}
+
+TEST (FixedPriceItemTest, buyNGetMOffInvalidPercentage){
+
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+
+    // should not be able to provide a percentage greater than 100 percent
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 1, 2, 1.1 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 4, 2, 1.01 ) );
+
+}
+
+TEST (FixedPriceItemTest, buyNGetMOffPerfectRound){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.addToCart( 6 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 17, .01 ); // 13.6 + 3.4
+
+}
+
+TEST (FixedPriceItemTest, buyNGetMOffLessThanMLeft){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.addToCart( 5 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 15.3, .01 ); // 13.6 + 1.7
+
+}
+
+TEST (FixedPriceItemTest, buyNGetMOffNoMLeft){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.addToCart( 4 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 13.6, .01 ); // 13.6 + 1.7
+
+}
+
+TEST (FixedPriceItemTest, buyNGetMOffWithMarkdown){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
+    ASSERT_EQ( OK, item.addToCart( 6 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 15, .01 ); // 12 + 3
+
+}
