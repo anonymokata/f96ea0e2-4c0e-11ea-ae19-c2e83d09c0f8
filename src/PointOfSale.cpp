@@ -15,280 +15,227 @@ PointOfSale::~PointOfSale()
 
 ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
 {
-    map<string,int>::iterator it;
-    map<string,double>::iterator it_db;
-
-    if(price <= 0.0)
-    {
-        return INVALID_PRICE;
-    }
+    map<string, FixedPriceItem*>::iterator f_it;
+    map<string, WeightBasedItem*>::iterator w_it;
 
     if(sku.length() == 0)
     {
         return INVALID_SKU;
     }
 
-    // check to see if price for this sku has already been added as a weight based item
-    it = fixed_price_cart.find(sku);
-    if(it != fixed_price_cart.end())
-    {
-        return PRICE_UPDATE_NOT_AVAILABLE;
-    }
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
 
-    // check to see if price for this sku has already been added as a weight based item
-    it_db = weight_prices.find(sku);
-    if(it_db != weight_prices.end())
+    // ensure that item hasn't already been added to system as a weight based
+    if(w_it != weight_items.end())
     {
         return PRICING_CONFLICT;
     }
 
-    // add the provided price to the fixed price maps
-    fixed_prices[sku] = price;
+    // if the item is already registered then call function to update price
+    if(f_it != fixed_items.end())
+    {
+        return f_it->second->setPrice(price);
+    }
+    else
+    {
+        FixedPriceItem* fixed = new FixedPriceItem();
+        ReturnCode_t code = fixed->setPrice(price);
+        fixed_items[sku] = fixed;
+        return code;
+    }
 
-    return OK;
 }
 
 ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
 {
-    map<string,double>::iterator it;
-
-    if(price <= 0.0)
-    {
-        return INVALID_PRICE;
-    }
+    map<string, FixedPriceItem*>::iterator f_it;
+    map<string, WeightBasedItem*>::iterator w_it;
 
     if(sku.length() == 0)
     {
         return INVALID_SKU;
     }
 
-    it = weight_cart.find(sku);
-    if(it != weight_cart.end())
-    {
-        return PRICE_UPDATE_NOT_AVAILABLE;
-    }
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
 
-    // check to see if price for this sku has already been added as a weight based item
-    it = fixed_prices.find(sku);
-    if(it != fixed_prices.end())
+    // ensure that item hasn't already been added to system as a fixed based
+    if(f_it != fixed_items.end())
     {
         return PRICING_CONFLICT;
     }
 
-    // add the provided price to the fixed price maps
-    weight_prices[sku] = price;
-
-    return OK;
+    // if the item is already registered then call function to update price
+    if(w_it != weight_items.end())
+    {
+        return w_it->second->setPrice(price);
+    }
+    else
+    {
+        WeightBasedItem* weight = new WeightBasedItem();
+        ReturnCode_t code = weight->setPrice(price);
+        weight_items[sku] = weight;
+        return code;
+    }
 }
 
 ReturnCode_t PointOfSale::addFixedPriceItem( std::string sku )
 {
-    map<string,int>::iterator it;
-    map<string,double>::iterator it_db;
+    map<string, FixedPriceItem*>::iterator f_it;
+    map<string, WeightBasedItem*>::iterator w_it;
 
     if(sku.length() == 0)
     {
         return INVALID_SKU;
     }
 
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
+
     // check to see if price for this sku has already been added as a weight based item
-    it_db = weight_prices.find(sku);
-    if(it_db != weight_prices.end())
+    if(w_it != weight_items.end())
     {
         return ITEM_CONFLICT;
     }
 
-    // Check to see that a price has been configured for this item
-    it_db = fixed_prices.find(sku);
-    if(it_db == fixed_prices.end())
+    // An item won't be added to the system if not given a valid price. As such, the existence
+    // of the item in the map means that a price has been defined
+    if(f_it == fixed_items.end())
     {
         return NO_PRICE_DEFINED;
     }
 
-    // check to see if item already in cart
-    it = fixed_price_cart.find(sku);
-    if(it == fixed_price_cart.end())
-    {
-        // if not in cart then it needs to be added with zero items so that 
-        // following code works regardless of current state of map
-        fixed_price_cart[sku] = 0;
-    }
-
-    // increment the count of the item within the cart for fixed price items
-    fixed_price_cart[sku] += 1;
-
-    return OK;
+    return f_it->second->addToCart( 1 );
 }
 
 ReturnCode_t PointOfSale::addItemWeight( std::string sku, double pounds )
 {
-    map<string,double>::iterator it;
+    map<string, FixedPriceItem*>::iterator f_it;
+    map<string, WeightBasedItem*>::iterator w_it;
 
     if(sku.length() == 0)
     {
         return INVALID_SKU;
     }
 
-    if(pounds <= 0.0)
-    {
-        return INVALID_WEIGHT;
-    }
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
 
-    // check to see if price for this sku has already been added as a weight based item
-    it = fixed_prices.find(sku);
-    if(it != fixed_prices.end())
+    // check to see if price for this sku has already been added as a fixed price item
+    if(f_it != fixed_items.end())
     {
         return ITEM_CONFLICT;
     }
 
-    // Check to see that a price has been configured for this item
-    it = weight_prices.find(sku);
-    if(it == weight_prices.end())
+    // An item won't be added to the system if not given a valid price. As such, the existence
+    // of the item in the map means that a price has been defined
+    if(w_it == weight_items.end())
     {
         return NO_PRICE_DEFINED;
     }
 
-    // check the cart to see if items of this type have already been added. If not, the itemm within the cart
-    // should be initialized to zero. This allows the following code to work regardless of whether this is the
-    // first time adding the weight based item as well as if its a repeat. 
-    it = weight_cart.find(sku);
-    if(it == weight_cart.end())
-    {
-        weight_cart[sku] = 0.0;
-    }
-
-    // increment the count for the given item in the cart
-    weight_cart[sku] += pounds;
-
-    return OK;
+    return w_it->second->addToCart( pounds );
 }
 
 ReturnCode_t PointOfSale::removeItem( std::string sku )
 {
-    map<string, int>::iterator it;
-    map<string, double>::iterator it_db;
+    map<string, FixedPriceItem*>::iterator f_it;
+    map<string, WeightBasedItem*>::iterator w_it;
 
     if(sku.length() == 0)
     {
         return INVALID_SKU;
     }
 
-    it_db = weight_prices.find(sku);
-    if(it_db != weight_prices.end())
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
+
+    // check to see if item was registered as a weight based item
+    if(w_it != weight_items.end())
     {
         return ITEM_CONFLICT;
     }
 
-    // verify that items of this type have been added to the cart in the past
-    it = fixed_price_cart.find(sku);
-    if(it == fixed_price_cart.end())
+    // check to see that it was registered as a fixed item
+    if(f_it == fixed_items.end())
     {
         return ITEM_NOT_IN_CART;
     }
 
-    // decrement the item count in the cart and erase the item from the cart
-    // entirely if there are no current items.
-    it->second -= 1;
-    if(it->second == 0)
-    {
-        fixed_price_cart.erase(it);
-    }
-
-    return OK;
+    return f_it->second->removeFromCart( 1 );
 }
 
 ReturnCode_t PointOfSale::removeItemWeight( std::string sku, double pounds )
 {
-    map<string, double>::iterator it;
+    map<string, FixedPriceItem*>::iterator f_it;
+    map<string, WeightBasedItem*>::iterator w_it;
 
     if(sku.length() == 0)
     {
         return INVALID_SKU;
     }
 
-    if(pounds <= 0)
-    {
-        return INVALID_WEIGHT;
-    }
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
 
-    it = fixed_prices.find(sku);
-    if(it != fixed_prices.end())
+    // check to see if item was registered as a fixed price item
+    if(f_it != fixed_items.end())
     {
         return ITEM_CONFLICT;
     }
 
-    // verify that items of this type have been added to the cart in the past
-    it = weight_cart.find(sku);
-    if(it == weight_cart.end())
+    // check to see that it was registered as a fixed item
+    if(w_it == weight_items.end())
     {
         return ITEM_NOT_IN_CART;
     }
 
-    if(pounds > it->second)
-    {
-        return ITEM_NOT_IN_CART;
-    }
-
-    it->second -= pounds;
-    if(it->second == 0.0)
-    {
-        weight_cart.erase(it);
-    }
-
-    return OK;
+    return w_it->second->removeFromCart( pounds );
 }
 
 double PointOfSale::getPreTaxTotal()
 {
     double total = 0.0;
     double price = 0.0;
-    map<string, int>::iterator fixed_cart_it;
-    map<string, double>::iterator weight_cart_it;
-    map<string, double>::iterator price_it;
-    map<string, double>::iterator markdown_it;
+
+    map<string, FixedPriceItem*>::iterator f_it;
+    map<string, WeightBasedItem*>::iterator w_it;
 
     // calculate totals for each of the fixed price items in cart
-    fixed_cart_it = fixed_price_cart.begin();
-    while( fixed_cart_it != fixed_price_cart.end() )
+    f_it = fixed_items.begin();
+    while( f_it != fixed_items.end() )
     {
-        // retrieve iterator for looking up the price of the item
-        price_it = fixed_prices.find(fixed_cart_it->first);
-        price = price_it->second;
-
-        // if a markdown has been configured then it needs to be applied
-        markdown_it = markdowns.find(fixed_cart_it->first);
-        if(markdown_it != markdowns.end())
+        ReturnCode_t code = f_it->second->computePreTax( &price );
+        if(code != OK)
         {
-            price = price - markdown_it->second;
+            // TODO - How to handle
         }
 
-        // compute the cost for this fixed price item based on configured price and number items
-        total += (fixed_cart_it->second * price);
-
-        // update the progress of the iterator so that next item can be processed
-        fixed_cart_it++;
+        // increment the total based on this item
+        total += price;
+        f_it++;
     }
 
-    // calculate totals for each of the weight based items in cart
-    weight_cart_it = weight_cart.begin();
-    while ( weight_cart_it != weight_cart.end() )
+    // calculate totals for each of the weight based item in cart
+    w_it = weight_items.begin();
+    while( w_it != weight_items.end() )
     {
-        // retrieve iterator to lookup the price per pound for the item
-        price_it = weight_prices.find(weight_cart_it->first);
-        price = price_it->second;
-
-        // if a markdown has been configured then it needs to be applied
-        markdown_it = markdowns.find(weight_cart_it->first);
-        if(markdown_it != markdowns.end())
+        ReturnCode_t code = w_it->second->computePreTax( &price );
+        if(code != OK)
         {
-            price = price - markdown_it->second;
+            // TODO - How to handle
         }
 
-        // compute the cost for the weighted items
-        total += (weight_cart_it->second * price);
-
-        // increment the iterator to walk through the cart
-        weight_cart_it++;
+        // increment the total based on this item
+        total += price;
+        w_it++;
     }
 
     return total;
@@ -296,47 +243,30 @@ double PointOfSale::getPreTaxTotal()
 
 ReturnCode_t PointOfSale::setMarkdown( std::string sku, double price )
 {
-    map<string, int>::iterator it;
-    map<string, double>::iterator fixed_it;
-    map<string, double>::iterator weight_it;
+    map<string, FixedPriceItem*>::iterator f_it;
+    map<string, WeightBasedItem*>::iterator w_it;
 
-    if(price < 0)
+    if(sku.length() == 0)
     {
-        return INVALID_PRICE;
+        return INVALID_SKU;
     }
 
-    // search the price maps for the given item and retrieve iterators
-    fixed_it  = fixed_prices.find(sku);
-    weight_it = weight_prices.find(sku);
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
 
-    // check to see if price defined in fixed
-    if(fixed_it == fixed_prices.end() && 
-      weight_it == weight_prices.end())
+    // check to see that this item has been defined and that a price has been set
+    if(f_it == fixed_items.end() && w_it == weight_items.end())
     {
         return NO_PRICE_DEFINED;
     }
-
-    // check and see if the provided markdown was too large
-    if(fixed_it != fixed_prices.end() && fixed_it->second < price)
+    else if(f_it != fixed_items.end())
     {
-        return INVALID_PRICE;
+        return f_it->second->applyMarkdown( price );
     }
-    else if(weight_it != weight_prices.end() && weight_it->second < price)
+    else
     {
-        return INVALID_PRICE;
+        return w_it->second->applyMarkdown( price );
     }
 
-    // check to see if an item has been placed in the cart. If so, then updates to
-    // to the markdown are not allowed per writeup
-    it = fixed_price_cart.find(sku);
-    weight_it = weight_cart.find(sku);
-    if(it != fixed_price_cart.end() || weight_it != weight_cart.end())
-    {
-        return PRICE_UPDATE_NOT_AVAILABLE;
-    }
-
-    // save the provided price into the map that keeps track of the markdown amounts
-    markdowns[sku] = price;
-
-    return OK;
 }

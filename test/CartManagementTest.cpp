@@ -4,7 +4,7 @@
 TEST (CartManagementTest, addItemNegativeWeight){
 
     PointOfSale sale;
-    sale.setItemPrice( "bananas", 2.50 );
+    sale.setPerPoundPrice( "bananas", 2.50 );
     ASSERT_EQ( INVALID_WEIGHT, sale.addItemWeight( "bananas", -1.0 ) );
 
 }

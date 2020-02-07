@@ -60,7 +60,7 @@ TEST (WeightBasedItemTest, applyTooBigOfMarkdown){
 
     WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( PRICING_CONFLICT, item.applyMarkdown(1.2) );
+    ASSERT_EQ( INVALID_PRICE, item.applyMarkdown(1.2) );
 
 }
 
@@ -68,7 +68,7 @@ TEST (WeightBasedItemTest, negativeMarkdown){
 
     WeightBasedItem item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( PRICING_CONFLICT, item.applyMarkdown(-1.0) );
+    ASSERT_EQ( INVALID_PRICE, item.applyMarkdown(-1.0) );
 
 }
 
