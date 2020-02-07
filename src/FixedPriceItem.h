@@ -23,6 +23,14 @@ class FixedPriceItem
     protected:
 
     private:
+
+        typedef enum
+        {
+            NO_DISCOUNT,
+            X_FOR_FLAT,
+            BUY_X_GET_Y_FOR_Z_LIMIT_W,
+        } DiscountType_t;
+
         int count_in_cart;
 
         double price;
@@ -30,6 +38,11 @@ class FixedPriceItem
 
         double markdown;
 
+        DiscountType_t discount_type;
+        int discount_x;
+        int discount_y;
+        double discount_percent;
+        int discount_limit;
 };
 
 #endif

@@ -1,3 +1,5 @@
+#include <cstdio>
+
 #include "Types.h"
 #include "FixedPriceItem.h"
 
@@ -7,6 +9,12 @@ FixedPriceItem::FixedPriceItem()
     markdown = 0.0;
     price = 0.0;
     is_price_set = false;
+
+    discount_type = NO_DISCOUNT;
+    discount_x = 0;
+    discount_y = 0;
+    discount_percent = 0.0;
+    discount_limit = 0;
 }
 
 FixedPriceItem::~FixedPriceItem()
@@ -57,7 +65,23 @@ ReturnCode_t FixedPriceItem::applyMarkdown( double amount )
 
 ReturnCode_t FixedPriceItem::applyDiscount( int buy_x, int get_y, double percent_off )
 {
-    return ERROR;
+    if(buy_x < 0 || get_y < 0 || percent_off < 0)
+    {
+        return INVALID_DISCOUNT;
+    }
+    if(percent_off > 1.0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    // save off values associated with discount to be utilized by pre-tax calculate function
+    discount_type = BUY_X_GET_Y_FOR_Z_LIMIT_W;
+    discount_x = buy_x;
+    discount_y = get_y;
+    discount_percent = percent_off;
+    discount_limit = 0;
+    
+    return OK;
 }
 
 ReturnCode_t FixedPriceItem::addToCart( int amount )
@@ -104,9 +128,61 @@ ReturnCode_t FixedPriceItem::computePreTax( double *pTaxAmount )
 
     // compute the adjusted cost based on markdown
     double normalized_cost = price - markdown;
+    double total = 0.0;
+    int items_discounted = 0;
+    int items_remain = count_in_cart;
+    while(discount_type != NO_DISCOUNT)
+    {
+        // check to see if the limit has been reached for particular discount
+        if((discount_limit != 0) && (items_discounted > discount_limit))
+        {
+            break;
+        }
 
-    // compute the based on item count in the cart
-    *pTaxAmount = normalized_cost * count_in_cart;
+        printf("items_remain: %d\n", items_remain);
+        printf("discount_x=%d\n", discount_x);
+
+        // check to see if enough items remain to qualify for discount
+        if(items_remain > discount_x)
+        {
+            // decrement items needing processed
+            items_remain -= discount_x;
+            items_discounted += discount_x;
+            total += (discount_x * normalized_cost);
+            printf("Adding: %f\n", discount_x * normalized_cost);
+
+            // calculate number items that should be discounted
+            int items_to_discount = discount_y;
+            if(items_remain == 0)
+            {
+                items_to_discount = 0;
+            }
+            else if(items_remain < discount_y)
+            {
+                items_to_discount = items_remain;
+            }
+
+            // decrement count so that the items are not counted again
+            items_remain -= items_to_discount;
+            items_discounted += items_to_discount;
+
+            // compute the discounted price adn add to the running total
+            double original_price = items_to_discount * normalized_cost;
+            double discount_price = original_price * (1 - discount_percent);
+
+            printf("Adding Discount: %f\n", discount_price);
+            total += discount_price;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    // compute cost for rest of the items that weren't covered by discount
+    total += (normalized_cost * items_remain);
+    printf("Final: %f\n", normalized_cost * items_remain);
+    *pTaxAmount = total;
 
     return OK;
 }
