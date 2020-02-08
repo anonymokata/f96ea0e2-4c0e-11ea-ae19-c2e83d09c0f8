@@ -289,3 +289,102 @@ TEST (FixedPriceItemTest, buyNGetMOffWithMarkdownWithLimit){
     ASSERT_NEAR( tax, 18, .01 ); // 12 + 6
 
 }
+
+TEST (FixedPriceItemTest, buyNForXPerfectRound){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
+    ASSERT_EQ( OK, item.addToCart( 6 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 3, 5.00 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 10, .01 );
+
+}
+
+TEST (FixedPriceItemTest, buyNForXPerfectRoundWithLimit){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
+    ASSERT_EQ( OK, item.addToCart( 6 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 3, 5.00, 3 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 14.0, .01 );
+
+}
+
+TEST (FixedPriceItemTest, buyNForXNotPerfectRound){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
+    ASSERT_EQ( OK, item.addToCart( 7 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 3, 5.00 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 13.4, .01 );
+
+}
+
+TEST (FixedPriceItemTest, buyNForXNotPerfectRoundWithLimit){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
+    ASSERT_EQ( OK, item.addToCart( 7 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 3, 5.00, 3 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 17.0, .01 );
+
+}
+
+TEST (FixedPriceItemTest, buyNForXNegativeArguments){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
+    ASSERT_EQ( OK, item.addToCart( 7 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( -3, 5.00, 3 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 3, -5.00, 3 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 3, 5.00, -3 ) );
+
+}
+
+TEST (FixedPriceItemTest, buyNGetYForXInvalidatedByItemRemoval){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
+    ASSERT_EQ( OK, item.addToCart( 6 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 15.0, .01 );
+
+    ASSERT_EQ( OK, item.removeFromCart( 3 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 9.0, .01 );
+
+}
+
+TEST (FixedPriceItemTest, buyNForXInvalidatedByItemRemoval){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
+    ASSERT_EQ( OK, item.addToCart( 4 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 4, 5.0 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 5.0, .01 );
+
+    ASSERT_EQ( OK, item.removeFromCart( 1 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 9.0, .01 );
+
+}

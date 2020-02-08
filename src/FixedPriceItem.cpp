@@ -63,6 +63,16 @@ ReturnCode_t FixedPriceItem::applyMarkdown( double amount )
     return OK;
 }
 
+ReturnCode_t FixedPriceItem::applyDiscount( int buy_amount, double price )
+{
+    return ERROR;
+}
+
+ReturnCode_t FixedPriceItem::applyDiscount( int buy_amount, double price, int limit )
+{
+    return ERROR;
+}
+
 ReturnCode_t FixedPriceItem::applyDiscount( int buy_x, int get_y, double percent_off )
 {
     if(buy_x < 0 || get_y < 0 || percent_off < 0)
@@ -144,10 +154,8 @@ ReturnCode_t FixedPriceItem::computePreTax( double *pTaxAmount )
     while(discount_type != NO_DISCOUNT)
     {
         // check to see if the limit has been reached for particular discount
-        printf("limit=%d, discounted=%d\n", discount_limit, items_discounted);
         if((discount_limit != 0) && (items_discounted >= discount_limit))
         {
-            printf("Items Remain: %d\n", items_remain);
             break;
         }
 
@@ -158,11 +166,9 @@ ReturnCode_t FixedPriceItem::computePreTax( double *pTaxAmount )
             items_remain -= discount_x;
             items_discounted += discount_x;
             total += (discount_x * normalized_cost);
-            printf("%f\n", discount_x * normalized_cost);
 
             if((discount_limit != 0) && (items_discounted >= discount_limit))
             {
-                printf("Items Remain: %d\n", items_remain);
                 break;
             }
 
@@ -185,7 +191,6 @@ ReturnCode_t FixedPriceItem::computePreTax( double *pTaxAmount )
             double original_price = items_to_discount * normalized_cost;
             double discount_price = original_price * (1 - discount_percent);
 
-            printf("%f\n", discount_price);
             total += discount_price;
         }
         else
@@ -196,7 +201,6 @@ ReturnCode_t FixedPriceItem::computePreTax( double *pTaxAmount )
 
     // compute cost for rest of the items that weren't covered by discount
     total += (normalized_cost * items_remain);
-    printf("%f\n", normalized_cost * items_remain);
     *pTaxAmount = total;
 
     return OK;

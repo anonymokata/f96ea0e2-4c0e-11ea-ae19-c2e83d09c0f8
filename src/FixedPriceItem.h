@@ -13,6 +13,9 @@ class FixedPriceItem
 
         ReturnCode_t setPrice( double price );
         ReturnCode_t applyMarkdown( double amount );
+
+        ReturnCode_t applyDiscount( int buy_amount, double price );
+        ReturnCode_t applyDiscount( int buy_amount, double price, int limit );
         ReturnCode_t applyDiscount( int buy_x, int get_y, double percent_off );
         ReturnCode_t applyDiscount( int buy_x, int get_y, double percent_off, int limit );
 
