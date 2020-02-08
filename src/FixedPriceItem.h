@@ -48,6 +48,7 @@ class FixedPriceItem
         int discount_x;
         int discount_y;
         double discount_percent;
+        double discount_price;
         int discount_limit;
 };
 

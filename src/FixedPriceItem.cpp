@@ -65,12 +65,32 @@ ReturnCode_t FixedPriceItem::applyMarkdown( double amount )
 
 ReturnCode_t FixedPriceItem::applyDiscount( int buy_amount, double price )
 {
-    return ERROR;
+    if(buy_amount < 0 || price < 0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    discount_type = X_FOR_FLAT;
+    discount_x = buy_amount;
+    discount_price = price;
+    discount_limit = 0;
+
+    return OK;
 }
 
 ReturnCode_t FixedPriceItem::applyDiscount( int buy_amount, double price, int limit )
 {
-    return ERROR;
+    if(buy_amount < 0 || price < 0 || limit < 0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    discount_type = X_FOR_FLAT;
+    discount_x = buy_amount;
+    discount_price = price;
+    discount_limit = limit;
+
+    return OK;
 }
 
 ReturnCode_t FixedPriceItem::applyDiscount( int buy_x, int get_y, double percent_off )
@@ -141,61 +161,78 @@ ReturnCode_t FixedPriceItem::removeFromCart( int amount )
 
 ReturnCode_t FixedPriceItem::computePreTax( double *pTaxAmount )
 {
+    double total = 0.0;
+    int items_discounted = 0;
+    int items_remain = count_in_cart;
+    double normalized_cost = price - markdown;
+
     if(!is_price_set)
     {
         return NO_PRICE_DEFINED;
     }
 
-    // compute the adjusted cost based on markdown
-    double normalized_cost = price - markdown;
-    double total = 0.0;
-    int items_discounted = 0;
-    int items_remain = count_in_cart;
-    while(discount_type != NO_DISCOUNT)
+    if(discount_type == X_FOR_FLAT)
     {
-        // check to see if the limit has been reached for particular discount
-        if((discount_limit != 0) && (items_discounted >= discount_limit))
+        while(items_remain >= discount_x)
         {
-            break;
-        }
+            if((items_discounted >= discount_limit) && (discount_limit != 0))
+            {
+                break;
+            }
 
-        // check to see if enough items remain to qualify for discount
-        if(items_remain > discount_x)
-        {
-            // decrement items needing processed
             items_remain -= discount_x;
             items_discounted += discount_x;
-            total += (discount_x * normalized_cost);
-
+            total += discount_price;
+        }
+    }
+    else if(discount_type == BUY_X_GET_Y_FOR_Z_LIMIT_W)
+    {
+        while(discount_type != NO_DISCOUNT)
+        {
+            // check to see if the limit has been reached for particular discount
             if((discount_limit != 0) && (items_discounted >= discount_limit))
             {
                 break;
             }
 
-            // calculate number items that should be discounted
-            int items_to_discount = discount_y;
-            if(items_remain == 0)
+            // check to see if enough items remain to qualify for discount
+            if(items_remain > discount_x)
             {
-                items_to_discount = 0;
+                // decrement items needing processed
+                items_remain -= discount_x;
+                items_discounted += discount_x;
+                total += (discount_x * normalized_cost);
+
+                if((discount_limit != 0) && (items_discounted >= discount_limit))
+                {
+                    break;
+                }
+
+                // calculate number items that should be discounted
+                int items_to_discount = discount_y;
+                if(items_remain == 0)
+                {
+                    items_to_discount = 0;
+                }
+                else if(items_remain < discount_y)
+                {
+                    items_to_discount = items_remain;
+                }
+
+                // decrement count so that the items are not counted again
+                items_remain -= items_to_discount;
+                items_discounted += items_to_discount;
+
+                // compute the discounted price adn add to the running total
+                double original_price = items_to_discount * normalized_cost;
+                double discount_price = original_price * (1 - discount_percent);
+
+                total += discount_price;
             }
-            else if(items_remain < discount_y)
+            else
             {
-                items_to_discount = items_remain;
+                break;
             }
-
-            // decrement count so that the items are not counted again
-            items_remain -= items_to_discount;
-            items_discounted += items_to_discount;
-
-            // compute the discounted price adn add to the running total
-            double original_price = items_to_discount * normalized_cost;
-            double discount_price = original_price * (1 - discount_percent);
-
-            total += discount_price;
-        }
-        else
-        {
-            break;
         }
     }
 

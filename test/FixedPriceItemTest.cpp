@@ -298,7 +298,7 @@ TEST (FixedPriceItemTest, buyNForXPerfectRound){
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 6 ) );
     ASSERT_EQ( OK, item.applyDiscount( 3, 5.00 ) );
-    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_EQ( OK, item.computePreTax( &tax )); 
     ASSERT_NEAR( tax, 10, .01 );
 
 }
@@ -325,7 +325,7 @@ TEST (FixedPriceItemTest, buyNForXNotPerfectRound){
     ASSERT_EQ( OK, item.addToCart( 7 ) );
     ASSERT_EQ( OK, item.applyDiscount( 3, 5.00 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
-    ASSERT_NEAR( tax, 13.4, .01 );
+    ASSERT_NEAR( tax, 13, .01 );
 
 }
 
