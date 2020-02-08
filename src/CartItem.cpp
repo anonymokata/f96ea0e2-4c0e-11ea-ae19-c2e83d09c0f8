@@ -9,12 +9,13 @@ CartItem<T>::CartItem()
     is_price_set = false;
     markdown = 0.0;
 
-    is_discount_set = false;
+    discount_type = NO_DISCOUNT;
     is_discount_limited = false;
 
     discount_x = 0;
     discount_y = 0;
-    discount_percent = 0;
+    discount_percent = 0.0;
+    discount_price = 0.0;
     discount_limit = 0;
 }
 
@@ -67,6 +68,46 @@ ReturnCode_t CartItem<T>::applyMarkdown( double amount )
 }
 
 template <class T>
+ReturnCode_t applyDiscount( T buy_amount, double price )
+{
+    if(buy_amount < 0 || price < 0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    discount_type = X_FOR_FLAT;
+
+    discount_x = buy_amount;
+    discount_y = 0;
+    discount_percent = 0.0;
+    discount_price = price;
+    is_discount_limited = false;
+    discount_limit = 0;
+
+    return OK;
+}
+
+template <class T>
+ReturnCode_t CartItem<T>::applyDiscount( T buy_amount, double price, T limit )
+{
+    if(buy_amount < 0 || price < 0 || limit <= 0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    discount_type = X_FOR_FLAT;
+    
+    discount_x = buy_amount;
+    discount_y = 0;
+    discount_percent = 0.0;
+    discount_price = price;
+    is_discount_limited = true;
+    discount_limit = limit;
+
+    return OK;
+}
+
+template <class T>
 ReturnCode_t CartItem<T>::applyDiscount( T buy_x, T get_y, double percent_off )
 {
     if(buy_x < 0 || get_y < 0 || percent_off < 0)
@@ -77,12 +118,15 @@ ReturnCode_t CartItem<T>::applyDiscount( T buy_x, T get_y, double percent_off )
     {
         return INVALID_DISCOUNT;
     }
+
+    discount_type = BUY_X_GET_Y_FOR_Z_LIMIT_W;
     
     discount_x = buy_x;
     discount_y = get_y;
     discount_limit = 0;
     is_discount_set = true;
     discount_percent = percent_off;
+    discount_price = 0.0;
     is_discount_limited = false;
     
     return OK;
@@ -99,12 +143,15 @@ ReturnCode_t CartItem<T>::applyDiscount( T buy_x, T get_y, double percent_off, T
     {
         return INVALID_DISCOUNT;
     }
+
+    discount_type = BUY_X_GET_Y_FOR_Z_LIMIT_W;
     
     discount_x = buy_x;
     discount_y = get_y;
     discount_limit = limit;
     is_discount_set = true;
     discount_percent = percent_off;
+    discount_price = 0.0;
     is_discount_limited = true;
     
     return OK;
@@ -159,51 +206,68 @@ ReturnCode_t CartItem<T>::computePreTax( double *pTaxAmount )
         return NO_PRICE_DEFINED;
     }
 
-    while(is_discount_set)
+    if(discount_type == X_FOR_FLAT)
     {
-        // check to see if the limit has been reached for particular discount
-        if((is_discount_limited) && (items_discounted >= discount_limit))
+        while(items_remain >= discount_x)
         {
-            break;
-        }
-
-        // check to see if enough items remain to qualify for discount
-        if(items_remain > discount_x)
-        {
-            // decrement items needing processed
-            items_remain -= discount_x;
-            items_discounted += discount_x;
-            total += (discount_x * normalized_cost);
-
-            if((discount_limit != 0) && (items_discounted >= discount_limit))
+            if((items_discounted >= discount_limit) && (discount_limit != 0))
             {
                 break;
             }
 
-            // calculate number items that should be discounted
-            T items_to_discount = discount_y;
-            if(items_remain == 0)
-            {
-                items_to_discount = 0;
-            }
-            else if(items_remain < discount_y)
-            {
-                items_to_discount = items_remain;
-            }
-
-            // decrement count so that the items are not counted again
-            items_remain -= items_to_discount;
-            items_discounted += items_to_discount;
-
-            // compute the discounted price adn add to the running total
-            double original_price = items_to_discount * normalized_cost;
-            double discount_price = original_price * (1 - discount_percent);
-
+            items_remain -= discount_x;
+            items_discounted += discount_x;
             total += discount_price;
         }
-        else
+    }
+    else if(discount_type == BUY_X_GET_Y_FOR_Z_LIMIT_W)
+    {
+        while(discount_type != NO_DISCOUNT)
         {
-            break;
+            // check to see if the limit has been reached for particular discount
+            if((is_discount_limited) && (items_discounted >= discount_limit))
+            {
+                break;
+            }
+
+            // check to see if enough items remain to qualify for discount
+            if(items_remain > discount_x)
+            {
+                // decrement items needing processed
+                items_remain -= discount_x;
+                items_discounted += discount_x;
+                total += (discount_x * normalized_cost);
+
+                if((discount_limit != 0) && (items_discounted >= discount_limit))
+                {
+                    break;
+                }
+
+                // calculate number items that should be discounted
+                T items_to_discount = discount_y;
+                if(items_remain == 0)
+                {
+                    items_to_discount = 0;
+                }
+                else if(items_remain < discount_y)
+                {
+                    items_to_discount = items_remain;
+                }
+
+                // decrement count so that the items are not counted again
+                items_remain -= items_to_discount;
+                items_discounted += items_to_discount;
+
+                // compute the discounted price adn add to the running total
+                double original_price = items_to_discount * normalized_cost;
+                double discount_price = original_price * (1 - discount_percent);
+
+                total += discount_price;
+            }
+            else
+            {
+                break;
+            }
         }
     }
 

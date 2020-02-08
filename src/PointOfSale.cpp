@@ -2,6 +2,7 @@
 
 #include "Types.h"
 #include "PointOfSale.h"
+#include "CartItem.h"
 
 PointOfSale::PointOfSale()
 {
@@ -15,8 +16,8 @@ PointOfSale::~PointOfSale()
 
 ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
 {
-    map<string, FixedPriceItem*>::iterator f_it;
-    map<string, WeightBasedItem*>::iterator w_it;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
 
     if(sku.length() == 0)
     {
@@ -40,7 +41,7 @@ ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
     }
     else
     {
-        FixedPriceItem* fixed = new FixedPriceItem();
+        CartItem<int>* fixed = new CartItem<int>();
         ReturnCode_t code = fixed->setPrice(price);
         fixed_items[sku] = fixed;
         return code;
@@ -50,8 +51,8 @@ ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
 
 ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
 {
-    map<string, FixedPriceItem*>::iterator f_it;
-    map<string, WeightBasedItem*>::iterator w_it;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
 
     if(sku.length() == 0)
     {
@@ -75,17 +76,17 @@ ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
     }
     else
     {
-        WeightBasedItem* weight = new WeightBasedItem();
+        CartItem<double>* weight = new CartItem<double>();
         ReturnCode_t code = weight->setPrice(price);
         weight_items[sku] = weight;
         return code;
     }
 }
 
-ReturnCode_t PointOfSale::addFixedPriceItem( std::string sku )
+ReturnCode_t PointOfSale::addToCart( std::string sku, int count )
 {
-    map<string, FixedPriceItem*>::iterator f_it;
-    map<string, WeightBasedItem*>::iterator w_it;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
 
     if(sku.length() == 0)
     {
@@ -112,10 +113,10 @@ ReturnCode_t PointOfSale::addFixedPriceItem( std::string sku )
     return f_it->second->addToCart( 1 );
 }
 
-ReturnCode_t PointOfSale::addItemWeight( std::string sku, double pounds )
+ReturnCode_t PointOfSale::addToCart( std::string sku, double pounds )
 {
-    map<string, FixedPriceItem*>::iterator f_it;
-    map<string, WeightBasedItem*>::iterator w_it;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
 
     if(sku.length() == 0)
     {
@@ -142,10 +143,10 @@ ReturnCode_t PointOfSale::addItemWeight( std::string sku, double pounds )
     return w_it->second->addToCart( pounds );
 }
 
-ReturnCode_t PointOfSale::removeItem( std::string sku )
+ReturnCode_t PointOfSale::removeFromCart( std::string sku, int count )
 {
-    map<string, FixedPriceItem*>::iterator f_it;
-    map<string, WeightBasedItem*>::iterator w_it;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
 
     if(sku.length() == 0)
     {
@@ -171,10 +172,10 @@ ReturnCode_t PointOfSale::removeItem( std::string sku )
     return f_it->second->removeFromCart( 1 );
 }
 
-ReturnCode_t PointOfSale::removeItemWeight( std::string sku, double pounds )
+ReturnCode_t PointOfSale::removeFromCart( std::string sku, double pounds )
 {
-    map<string, FixedPriceItem*>::iterator f_it;
-    map<string, WeightBasedItem*>::iterator w_it;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
 
     if(sku.length() == 0)
     {
@@ -205,8 +206,8 @@ double PointOfSale::getPreTaxTotal()
     double total = 0.0;
     double price = 0.0;
 
-    map<string, FixedPriceItem*>::iterator f_it;
-    map<string, WeightBasedItem*>::iterator w_it;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
 
     // calculate totals for each of the fixed price items in cart
     f_it = fixed_items.begin();
@@ -243,8 +244,8 @@ double PointOfSale::getPreTaxTotal()
 
 ReturnCode_t PointOfSale::setMarkdown( std::string sku, double price )
 {
-    map<string, FixedPriceItem*>::iterator f_it;
-    map<string, WeightBasedItem*>::iterator w_it;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
 
     if(sku.length() == 0)
     {
@@ -269,4 +270,34 @@ ReturnCode_t PointOfSale::setMarkdown( std::string sku, double price )
         return w_it->second->applyMarkdown( price );
     }
 
+}
+        
+ReturnCode_t PointOfSale::applyGetXForYDiscount  ( std::string sku, int buy_x, double amount )
+{
+    return ERROR;
+}
+
+ReturnCode_t PointOfSale::applyGetXForYDiscount  ( std::string sku, int buy_x, double amount, int limit )
+{
+    return ERROR;
+}
+
+ReturnCode_t PointOfSale::applyBuyXGetYAtDiscount( std::string sku, int buy_x, int get_y, double percent_off )
+{
+    return ERROR;
+}
+
+ReturnCode_t PointOfSale::applyBuyXGetYAtDiscount( std::string sku, double buy_x, double get_y, double percent_off )
+{
+    return ERROR;
+}
+
+ReturnCode_t PointOfSale::applyBuyXGetYAtDiscount( std::string sku, int buy_x, int get_y, double percent_off, int limit )
+{
+    return ERROR;
+}
+
+ReturnCode_t PointOfSale::applyBuyXGetYAtDiscount( std::string sku, double buy_x, double get_y, double percent_off, double limit )
+{
+    return ERROR;
 }

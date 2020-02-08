@@ -11,6 +11,8 @@ class CartItem {
         ReturnCode_t setPrice( double price );
         ReturnCode_t applyMarkdown( double amount );
 
+        ReturnCode_t applyDiscount( int buy_amount, double price );
+        ReturnCode_t applyDiscount( int buy_amount, double price, int limit );
         ReturnCode_t applyDiscount( T buy_x, T get_y, double percent_off );
         ReturnCode_t applyDiscount( T buy_x, T get_y, double percent_off, T limit );
 
@@ -19,8 +21,16 @@ class CartItem {
 
         ReturnCode_t computePreTax( double *pTaxAmount );
 
-    private: 
-      
+    private:
+
+        typedef enum
+        {
+            NO_DISCOUNT,
+            X_FOR_FLAT,
+            BUY_X_GET_Y_FOR_Z_LIMIT_W,
+        } DiscountType_t;
+
+        DiscountType_t discount_type;
         T amount_in_cart;  // maintain count of item in the cart
 
         // All related to the price and markdown

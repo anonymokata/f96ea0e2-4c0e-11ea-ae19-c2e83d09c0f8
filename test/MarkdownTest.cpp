@@ -58,7 +58,7 @@ TEST_F (MarkdownTestFixture, setMarkdownMultipleTimes){
 TEST_F (MarkdownTestFixture, setMarkdownAfterItemToCart){
 
     ASSERT_EQ( OK, pSale->setMarkdown( "Bananas", 0.20 ));
-    ASSERT_EQ( OK, pSale->addItemWeight( "Bananas", 2.34));
+    ASSERT_EQ( OK, pSale->addToCart( "Bananas", 2.34));
     ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, pSale->setMarkdown( "Bananas", 0.30 ));
 
 }
@@ -67,9 +67,9 @@ TEST_F (MarkdownTestFixture, setMarkdownFixedPrice){
 
     ASSERT_EQ( OK, pSale->setMarkdown( "Soup", 0.20 ));
 
-    ASSERT_EQ( OK, pSale->addFixedPriceItem( "Cookies" ));
-    ASSERT_EQ( OK, pSale->addFixedPriceItem( "Cookies" ));
-    ASSERT_EQ( OK, pSale->addFixedPriceItem( "Soup" ));
+    ASSERT_EQ( OK, pSale->addToCart( "Cookies", 1 ));
+    ASSERT_EQ( OK, pSale->addToCart( "Cookies", 1 ));
+    ASSERT_EQ( OK, pSale->addToCart( "Soup", 1 ));
 
     ASSERT_NEAR( pSale->getPreTaxTotal(), 5.3, .01);
 
@@ -79,9 +79,9 @@ TEST_F (MarkdownTestFixture, setMarkdownFixedPriceDualItems){
 
     ASSERT_EQ( OK, pSale->setMarkdown( "Cookies", 0.26 ));
 
-    ASSERT_EQ( OK, pSale->addFixedPriceItem( "Cookies" ));
-    ASSERT_EQ( OK, pSale->addFixedPriceItem( "Cookies" ));
-    ASSERT_EQ( OK, pSale->addFixedPriceItem( "Soup" ));
+    ASSERT_EQ( OK, pSale->addToCart( "Cookies", 1 ));
+    ASSERT_EQ( OK, pSale->addToCart( "Cookies", 1 ));
+    ASSERT_EQ( OK, pSale->addToCart( "Soup", 1 ));
 
     ASSERT_NEAR( pSale->getPreTaxTotal(), 4.98, .01);
 
@@ -90,7 +90,7 @@ TEST_F (MarkdownTestFixture, setMarkdownFixedPriceDualItems){
 TEST_F (MarkdownTestFixture, setMarkdownWeightBasedMarkdownSingle){
 
     ASSERT_EQ( OK, pSale->setMarkdown( "Apples", 0.41 ));
-    ASSERT_EQ( OK, pSale->addItemWeight( "Apples", 2.0 ));
+    ASSERT_EQ( OK, pSale->addToCart( "Apples", 2.0 ));
     ASSERT_NEAR( pSale->getPreTaxTotal(), 2.0, .01);
 
 }
@@ -100,10 +100,10 @@ TEST_F (MarkdownTestFixture, setMarkdownMixedItemsMarkdown){
     ASSERT_EQ( OK, pSale->setMarkdown( "Apples",  0.41 ));
     ASSERT_EQ( OK, pSale->setMarkdown( "Cookies", 0.26 ));
 
-    ASSERT_EQ( OK, pSale->addItemWeight( "Apples", 2.0 )); // 2.0
-    ASSERT_EQ( OK, pSale->addFixedPriceItem( "Cookies" )); // 2.0
-    ASSERT_EQ( OK, pSale->addFixedPriceItem( "Cookies" )); // 2.0
-    ASSERT_EQ( OK, pSale->addFixedPriceItem( "Soup" ));
+    ASSERT_EQ( OK, pSale->addToCart( "Apples", 2.0 )); // 2.0
+    ASSERT_EQ( OK, pSale->addToCart( "Cookies", 1 )); // 2.0
+    ASSERT_EQ( OK, pSale->addToCart( "Cookies", 1 )); // 2.0
+    ASSERT_EQ( OK, pSale->addToCart( "Soup", 1 ));
 
     ASSERT_NEAR( pSale->getPreTaxTotal(), 6.98, .01);
 

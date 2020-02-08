@@ -5,8 +5,9 @@
 #include <map>
 
 #include "Types.h"
-#include "FixedPriceItem.h"
-#include "WeightBasedItem.h"
+#include "CartItem.h"
+// #include "FixedPriceItem.h"
+// #include "WeightBasedItem.h"
 
 using namespace std;
 
@@ -29,6 +30,25 @@ class PointOfSale
 
         PointOfSale();
         ~PointOfSale();
+
+        /// \fn setMarkdown
+        /// \brief Provides ability to enable a marked down price on an item
+        ///
+        /// The PointOfSale system supports the ability to register an item with a marked down price. In this situation,
+        /// the price of a fixed price item will be reduced by the amount. For a weight based item, the markdown
+        /// price will be applied to each pound of the iem that is sold.
+        ///
+        /// \param sku Represents the itemt hat is being added
+        /// \param price Amount of discount to apply to the item
+        ReturnCode_t setMarkdown( std::string sku, double price );
+
+        /// \fn getPreTaxTotal
+        /// \brief Calculates the pre-tax total for all items within cart
+        ///
+        /// The PointOfSale system keep track of the items in the shopping cart. The items in the cart and
+        /// any assoicated discounts and/or markdowns are taken into account when calculating the total
+        /// cost of the cart.
+        double getPreTaxTotal();
 
         /// \fn setItemPrice
         /// \brief Provides ability to setup a fixed price for a SKU
@@ -59,30 +79,8 @@ class PointOfSale
         /// \param price The price per pound of the unit being added to the cart
         ReturnCode_t setPerPoundPrice( std::string sku, double price );
 
-        /// \fn setMarkdown
-        /// \brief Provides ability to enable a marked down price on an item
-        ///
-        /// The PointOfSale system supports the ability to register an item with a marked down price. In this situation,
-        /// the price of a fixed price item will be reduced by the amount. For a weight based item, the markdown
-        /// price will be applied to each pound of the iem that is sold.
-        ///
-        /// \param sku Represents the itemt hat is being added
-        /// \param price Amount of discount to apply to the item
-        ReturnCode_t setMarkdown( std::string sku, double price );
-
-        /// \fn addFixedPriceItem
-        /// \brief Adds a fixed price item to the shopping cart
-        ///
-        /// This function adds an item of the designated SKU to the shopping cart. The provided SKU must have
-        /// already been configured as a fixed price item via the setItemPrice function. It's possible to add
-        /// several instances of the same SKU to the cart by calling this function multiple times. Attempting to
-        /// add SKU's configured as a weight based product is not allowed via this function.
-        ///
-        /// \param sku Represents the item that is being added
-        ReturnCode_t addFixedPriceItem( std::string sku );
-
-        /// \fn addItemWeight
-        /// \brief Adds a weight based item to the shopping cart
+        /// \fn addToCart
+        /// \brief Adds fixed price items to the cart
         ///
         /// This function adds the specified amount of the SKu to the shopping cart. The provided SKU must have
         /// already been configured as a weight based item via the setPerPoundPrice function. Multiple calls
@@ -91,22 +89,32 @@ class PointOfSale
         ///
         /// \param sku Represents the item that is being added
         /// \param pound Amount of the item that should be added to the cart, in pounds
-        ReturnCode_t addItemWeight( std::string sku, double pounds );
+        ReturnCode_t addToCart( std::string sku, int count );
 
-        // Provide mechanism for removing an item that was previously scanned
+        /// \fn addToCart
+        /// \brief Adds weight to an item in the cart
+        ///
+        /// This function adds the specified amount of the SKu to the shopping cart. The provided SKU must have
+        /// already been configured as a weight based item via the setPerPoundPrice function. Multiple calls
+        /// can be made to this function for a given SKU. The amounts for all calls will be added when the
+        /// total is calculated.
+        ///
+        /// \param sku Represents the item that is being added
+        /// \param pound Amount of the item that should be added to the cart, in pounds
+        ReturnCode_t addToCart( std::string sku, double weight );
 
-        /// \fn removeItem
-        /// \brief Removes a fixed price item from the cart
+        /// \fn removeFromCart
+        /// \brief Removes fixed price items from cart
         ///
         /// To account for possible mistakes that can take place at the register, the PointOfSale system supports
         /// the ability to remove items that may have been scanned in error. This function handles the process of
-        /// removing a single item of the specified SKU from the cart. The provided SKU must have already been
-        /// added to the cart for this function.
+        /// removing a portion of a weight based item that was scanned in error. Once removed, the weight will no
+        /// longer be factored into the calculation of the pre-tax price.
         ///
         /// \param sku Represents the item that is being added
-        ReturnCode_t removeItem( std::string sku );
+        ReturnCode_t removeFromCart( std::string sku, int count );
 
-        /// \fn removeItemWeight
+        /// \fn removeFromCart
         /// \brief Removes portion of weight based item from shopping cart
         ///
         /// To account for possible mistakes that can take place at the register, the PointOfSale system supports
@@ -115,21 +123,23 @@ class PointOfSale
         /// longer be factored into the calculation of the pre-tax price.
         ///
         /// \param sku Represents the item that is being added
-        ReturnCode_t removeItemWeight( std::string sku, double pounds );
+        ReturnCode_t removeFromCart( std::string sku, double weight );
 
-        /// \fn getPreTaxTotal
-        /// \brief Calculates the pre-tax total for all items within cart
-        ///
-        /// The PointOfSale system keep track of the items in the shopping cart. The items in the cart and
-        /// any assoicated discounts and/or markdowns are taken into account when calculating the total
-        /// cost of the cart.
-        double getPreTaxTotal();
+        ReturnCode_t applyGetXForYDiscount  ( std::string sku, int buy_x, double amount );
+        ReturnCode_t applyGetXForYDiscount  ( std::string sku, int buy_x, double amount, int limit );
 
+        ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, int buy_x, int get_y, double percent_off );
+        ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, double buy_x, double get_y, double percent_off );
+        ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, int buy_x, int get_y, double percent_off, int limit );
+        ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, double buy_x, double get_y, double percent_off, double limit );
+
+        
     protected:
 
     private:
-        map<string, FixedPriceItem*>  fixed_items;
-        map<string, WeightBasedItem*> weight_items;
+        // map<string, FixedPriceItem*>  fixed_items;
+        map<string, CartItem<int>*>  fixed_items;
+        map<string, CartItem<double>*> weight_items;
 
 };
 
