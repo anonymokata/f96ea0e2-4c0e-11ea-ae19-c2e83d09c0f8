@@ -1,14 +1,13 @@
-#include <cstdio>
-
 #include "Types.h"
 #include "FixedPriceItem.h"
 
 FixedPriceItem::FixedPriceItem()
 {
     count_in_cart = 0;
-    markdown = 0.0;
+    
     price = 0.0;
     is_price_set = false;
+	markdown = 0.0;
 
     discount_type = NO_DISCOUNT;
     is_discount_limited = false;
@@ -52,7 +51,7 @@ ReturnCode_t FixedPriceItem::applyMarkdown( double amount )
 
     if(amount < 0 || amount > price)
     {
-        return PRICING_CONFLICT;
+        return INVALID_PRICE;
     }
 
     if(count_in_cart > 0)

@@ -1,9 +1,10 @@
 #include "Types.h"
-#include "WeightBasedItem.h"
+#include "CartItem.h"
 
-WeightBasedItem::WeightBasedItem()
+template <class T>
+CartItem<T>::CartItem()
 {
-    weight_in_cart = 0.0;
+    amount_in_cart = 0;
     price = 0.0;
     is_price_set = false;
     markdown = 0.0;
@@ -11,26 +12,27 @@ WeightBasedItem::WeightBasedItem()
     is_discount_set = false;
     is_discount_limited = false;
 
-    discount_x = 0.0;
-    discount_y = 0.0;
-    discount_percent = 0.0;
-    discount_limit = 0.0;
+    discount_x = 0;
+    discount_y = 0;
+    discount_percent = 0;
+    discount_limit = 0;
 }
 
-WeightBasedItem::~WeightBasedItem()
+template <class T>
+CartItem<T>::~CartItem()
 {
 
 }
 
-ReturnCode_t WeightBasedItem::setPrice( double amount )
+template <class T>
+ReturnCode_t CartItem<T>::setPrice( double amount )
 {
-
     if(amount <= 0.0)
     {
         return INVALID_PRICE;
     }
 
-    if(weight_in_cart > 0)
+    if(amount_in_cart > 0)
     {
         return PRICE_UPDATE_NOT_AVAILABLE;
     }
@@ -41,7 +43,8 @@ ReturnCode_t WeightBasedItem::setPrice( double amount )
     return OK;
 }
 
-ReturnCode_t WeightBasedItem::applyMarkdown( double amount )
+template <class T>
+ReturnCode_t CartItem<T>::applyMarkdown( double amount )
 {
     if(!is_price_set)
     {
@@ -53,7 +56,7 @@ ReturnCode_t WeightBasedItem::applyMarkdown( double amount )
         return INVALID_PRICE;
     }
 
-    if(weight_in_cart > 0)
+    if(amount_in_cart > 0)
     {
         return PRICE_UPDATE_NOT_AVAILABLE;
     }
@@ -63,9 +66,9 @@ ReturnCode_t WeightBasedItem::applyMarkdown( double amount )
     return OK;
 }
 
-ReturnCode_t WeightBasedItem::applyDiscount( double buy_x, double get_y, double percent_off )
+template <class T>
+ReturnCode_t CartItem<T>::applyDiscount( T buy_x, T get_y, double percent_off )
 {
-
     if(buy_x < 0 || get_y < 0 || percent_off < 0)
     {
         return INVALID_DISCOUNT;
@@ -74,22 +77,20 @@ ReturnCode_t WeightBasedItem::applyDiscount( double buy_x, double get_y, double 
     {
         return INVALID_DISCOUNT;
     }
-
-    is_discount_set = true;
     
-
     discount_x = buy_x;
     discount_y = get_y;
+    discount_limit = 0;
+    is_discount_set = true;
     discount_percent = percent_off;
     is_discount_limited = false;
-    discount_limit = 0;
-
+    
     return OK;
 }
 
-ReturnCode_t WeightBasedItem::applyDiscount( double buy_x, double get_y, double percent_off, double limit )
+template <class T>
+ReturnCode_t CartItem<T>::applyDiscount( T buy_x, T get_y, double percent_off, T limit )
 {
-
     if(buy_x < 0 || get_y < 0 || percent_off < 0 || limit <= 0)
     {
         return INVALID_DISCOUNT;
@@ -98,58 +99,59 @@ ReturnCode_t WeightBasedItem::applyDiscount( double buy_x, double get_y, double 
     {
         return INVALID_DISCOUNT;
     }
-
-    is_discount_set = true;
     
-
     discount_x = buy_x;
     discount_y = get_y;
+    discount_limit = limit;
+    is_discount_set = true;
     discount_percent = percent_off;
     is_discount_limited = true;
-    discount_limit = limit;
-
+    
     return OK;
 }
 
-ReturnCode_t WeightBasedItem::addToCart( double weight )
+template <class T>
+ReturnCode_t CartItem<T>::addToCart( T amount )
 {
     if(!is_price_set)
     {
         return NO_PRICE_DEFINED;
     }
 
-    if(weight <= 0)
+    if(amount <= 0)
     {
-        return INVALID_WEIGHT;
+        return ERROR;
     }
 
-    weight_in_cart += weight;
+    amount_in_cart += amount;
 
     return OK;
 }
 
-ReturnCode_t WeightBasedItem::removeFromCart( double weight )
+template <class T>
+ReturnCode_t CartItem<T>::removeFromCart( T amount )
 {
-    if(weight < 0)
-    {
-        return INVALID_WEIGHT;
-    }
-
-    if(weight > weight_in_cart)
+    if(amount_in_cart < amount || amount_in_cart == 0)
     {
         return ITEM_NOT_IN_CART;
     }
 
-    weight_in_cart -= weight;
+    if(amount <= 0)
+    {
+        return ERROR;
+    }
+
+    amount_in_cart -= amount;
 
     return OK;
 }
 
-ReturnCode_t WeightBasedItem::computePreTax( double *pTaxAmount )
+template <class T>
+ReturnCode_t CartItem<T>::computePreTax( double *pTaxAmount )
 {
     double total = 0.0;
-    double items_discounted = 0;
-    double items_remain = weight_in_cart;
+    T items_discounted = 0;
+    T items_remain = amount_in_cart;
     double normalized_cost = price - markdown;
 
     if(!is_price_set)
@@ -179,7 +181,7 @@ ReturnCode_t WeightBasedItem::computePreTax( double *pTaxAmount )
             }
 
             // calculate number items that should be discounted
-            int items_to_discount = discount_y;
+            T items_to_discount = discount_y;
             if(items_remain == 0)
             {
                 items_to_discount = 0;
