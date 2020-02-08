@@ -11,9 +11,11 @@ FixedPriceItem::FixedPriceItem()
     is_price_set = false;
 
     discount_type = NO_DISCOUNT;
+    is_discount_limited = false;
     discount_x = 0;
     discount_y = 0;
     discount_percent = 0.0;
+    discount_price = 0.0;
     discount_limit = 0;
 }
 
@@ -71,8 +73,12 @@ ReturnCode_t FixedPriceItem::applyDiscount( int buy_amount, double price )
     }
 
     discount_type = X_FOR_FLAT;
+    
     discount_x = buy_amount;
+    discount_y = 0;
+    discount_percent = 0.0;
     discount_price = price;
+    is_discount_limited = false;
     discount_limit = 0;
 
     return OK;
@@ -80,14 +86,18 @@ ReturnCode_t FixedPriceItem::applyDiscount( int buy_amount, double price )
 
 ReturnCode_t FixedPriceItem::applyDiscount( int buy_amount, double price, int limit )
 {
-    if(buy_amount < 0 || price < 0 || limit < 0)
+    if(buy_amount < 0 || price < 0 || limit <= 0)
     {
         return INVALID_DISCOUNT;
     }
 
     discount_type = X_FOR_FLAT;
+    
     discount_x = buy_amount;
+    discount_y = 0;
+    discount_percent = 0.0;
     discount_price = price;
+    is_discount_limited = true;
     discount_limit = limit;
 
     return OK;
@@ -104,24 +114,39 @@ ReturnCode_t FixedPriceItem::applyDiscount( int buy_x, int get_y, double percent
         return INVALID_DISCOUNT;
     }
 
-    // save off values associated with discount to be utilized by pre-tax calculate function
     discount_type = BUY_X_GET_Y_FOR_Z_LIMIT_W;
+    
     discount_x = buy_x;
     discount_y = get_y;
     discount_percent = percent_off;
+    discount_price = 0.0;
+    is_discount_limited = false;
+    discount_limit = 0.0;
     
     return OK;
 }
 
 ReturnCode_t FixedPriceItem::applyDiscount( int buy_x, int get_y, double percent_off, int limit )
 {
-    if(limit < 0)
+    if(buy_x < 0 || get_y < 0 || percent_off < 0 || limit <= 0)
+    {
+        return INVALID_DISCOUNT;
+    }
+    if(percent_off > 1.0)
     {
         return INVALID_DISCOUNT;
     }
 
+    discount_type = BUY_X_GET_Y_FOR_Z_LIMIT_W;
+    
+    discount_x = buy_x;
+    discount_y = get_y;
+    discount_percent = percent_off;
+    discount_price = 0.0;
+    is_discount_limited = true;
     discount_limit = limit;
-    return applyDiscount( buy_x, get_y, percent_off );
+
+    return OK;
 }
 
 ReturnCode_t FixedPriceItem::addToCart( int amount )
@@ -190,7 +215,7 @@ ReturnCode_t FixedPriceItem::computePreTax( double *pTaxAmount )
         while(discount_type != NO_DISCOUNT)
         {
             // check to see if the limit has been reached for particular discount
-            if((discount_limit != 0) && (items_discounted >= discount_limit))
+            if((is_discount_limited) && (items_discounted >= discount_limit))
             {
                 break;
             }

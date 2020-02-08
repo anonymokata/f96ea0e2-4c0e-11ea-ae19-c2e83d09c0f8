@@ -45,6 +45,7 @@ class FixedPriceItem
         double markdown;
 
         DiscountType_t discount_type;
+        bool is_discount_limited;
         int discount_x;
         int discount_y;
         double discount_percent;

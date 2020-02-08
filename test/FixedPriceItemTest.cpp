@@ -228,6 +228,16 @@ TEST (FixedPriceItemTest, buyNGetMOffPerfectRoundWithLimit){
 
 }
 
+TEST (FixedPriceItemTest, buyNGetMOffPerfectRoundWithZeroLimit){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.addToCart( 12 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 4, 2, 0.5, 0 ) );
+
+}
+
 TEST (FixedPriceItemTest, buyNGetMOffWithLessThanMLeft){
 
     double tax = 0.0;
@@ -339,6 +349,17 @@ TEST (FixedPriceItemTest, buyNForXNotPerfectRoundWithLimit){
     ASSERT_EQ( OK, item.applyDiscount( 3, 5.00, 3 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 17.0, .01 );
+
+}
+
+TEST (FixedPriceItemTest, buyNForXNotPerfectRoundWithZeroLimit){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
+    ASSERT_EQ( OK, item.addToCart( 7 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 3, 5.00, 0 ) );
 
 }
 
