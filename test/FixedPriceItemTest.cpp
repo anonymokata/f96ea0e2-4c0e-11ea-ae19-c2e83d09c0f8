@@ -215,7 +215,20 @@ TEST (FixedPriceItemTest, buyNGetMOffPerfectRound){
 
 }
 
-TEST (FixedPriceItemTest, buyNGetMOffLessThanMLeft){
+
+TEST (FixedPriceItemTest, buyNGetMOffPerfectRoundWithLimit){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.addToCart( 12 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5, 6 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 37.40, .01 );
+
+}
+
+TEST (FixedPriceItemTest, buyNGetMOffWithLessThanMLeft){
 
     double tax = 0.0;
     FixedPriceItem item;
@@ -239,6 +252,18 @@ TEST (FixedPriceItemTest, buyNGetMOffNoMLeft){
 
 }
 
+TEST (FixedPriceItemTest, buyNGetMOffWithLimitPreventingMOff){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.addToCart( 6 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5, 4 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 20.4, .01 );
+
+}
+
 TEST (FixedPriceItemTest, buyNGetMOffWithMarkdown){
 
     double tax = 0.0;
@@ -249,5 +274,18 @@ TEST (FixedPriceItemTest, buyNGetMOffWithMarkdown){
     ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 15, .01 ); // 12 + 3
+
+}
+
+TEST (FixedPriceItemTest, buyNGetMOffWithMarkdownWithLimit){
+
+    double tax = 0.0;
+    FixedPriceItem item;
+    ASSERT_EQ( OK, item.setPrice(3.4));
+    ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
+    ASSERT_EQ( OK, item.addToCart( 6 ) );
+    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5, 4 ) );
+    ASSERT_EQ( OK, item.computePreTax( &tax ));
+    ASSERT_NEAR( tax, 18, .01 ); // 12 + 6
 
 }

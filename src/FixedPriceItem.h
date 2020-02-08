@@ -14,6 +14,7 @@ class FixedPriceItem
         ReturnCode_t setPrice( double price );
         ReturnCode_t applyMarkdown( double amount );
         ReturnCode_t applyDiscount( int buy_x, int get_y, double percent_off );
+        ReturnCode_t applyDiscount( int buy_x, int get_y, double percent_off, int limit );
 
         ReturnCode_t addToCart( int amount );
         ReturnCode_t removeFromCart( int amount );
@@ -26,9 +27,11 @@ class FixedPriceItem
 
         typedef enum
         {
+            
             NO_DISCOUNT,
             X_FOR_FLAT,
             BUY_X_GET_Y_FOR_Z_LIMIT_W,
+
         } DiscountType_t;
 
         int count_in_cart;
