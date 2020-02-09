@@ -1,5 +1,3 @@
-#include <cstdio>
-
 #include "Types.h"
 #include "CartItem.h"
 
@@ -211,11 +209,6 @@ ReturnCode_t CartItem<T>::computePreTax( double *pTaxAmount )
     T items_remain = amount_in_cart;
     double normalized_cost = price - markdown;
 
-    if(!is_price_set)
-    {
-        return NO_PRICE_DEFINED;
-    }
-
     if(discount_type == X_FOR_FLAT)
     {
         T discount_remain = discount_limit - items_discounted;
@@ -239,12 +232,9 @@ ReturnCode_t CartItem<T>::computePreTax( double *pTaxAmount )
         while(discount_type != NO_DISCOUNT)
         {
 
-            printf("bytes_remain=%f, items_discounted=%f, discount_limit=%f\n", items_remain, items_discounted, discount_limit );
-
             // check to see if the limit has been reached for particular discount
             if((is_discount_limited) && (items_discounted >= discount_limit))
             {
-                printf("Breaking Out\n");
                 break;
             }
 

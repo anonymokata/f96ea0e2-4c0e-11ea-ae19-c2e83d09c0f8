@@ -213,13 +213,7 @@ double PointOfSale::getPreTaxTotal()
     f_it = fixed_items.begin();
     while( f_it != fixed_items.end() )
     {
-        ReturnCode_t code = f_it->second->computePreTax( &price );
-        if(code != OK)
-        {
-            // TODO - How to handle
-        }
-
-        printf("%s - %f\n", f_it->first.c_str(), price );
+        f_it->second->computePreTax( &price );
 
         // increment the total based on this item
         total += price;
@@ -230,20 +224,12 @@ double PointOfSale::getPreTaxTotal()
     w_it = weight_items.begin();
     while( w_it != weight_items.end() )
     {
-        ReturnCode_t code = w_it->second->computePreTax( &price );
-        if(code != OK)
-        {
-            // TODO - How to handle
-        }
-
-        printf("%s - %f\n", w_it->first.c_str(), price );
+        w_it->second->computePreTax( &price );
 
         // increment the total based on this item
         total += price;
         w_it++;
     }
-
-    printf("Total: %f\n", total);
 
     return total;
 }

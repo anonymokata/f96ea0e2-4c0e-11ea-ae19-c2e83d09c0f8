@@ -119,14 +119,6 @@ TEST (WeightBasedItemTest, removeItemFromCart){
 //                           Compute Pre-Tax Verification
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST (WeightBasedItemTest, computeTaxWithoutPrice){
-
-    double tax = 0;
-    CartItem<double> item;
-    ASSERT_EQ( NO_PRICE_DEFINED, item.computePreTax( &tax ) );
-
-}
-
 TEST (WeightBasedItemTest, computeTaxNoItemsInCarts){
 
     double tax = 0;

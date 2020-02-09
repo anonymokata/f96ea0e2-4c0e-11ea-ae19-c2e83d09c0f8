@@ -137,14 +137,6 @@ TEST (FixedPriceItemTest, removeItemFromCartNegativeAmount){
 //                           Compute Pre-Tax Verification
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST (FixedPriceItemTest, computeTaxWithoutPrice){
-
-    double tax = 0;
-    CartItem<int> item;
-    ASSERT_EQ( NO_PRICE_DEFINED, item.computePreTax( &tax ) );
-
-}
-
 TEST (FixedPriceItemTest, computeTaxNoItemsInCarts){
 
     double tax = 0;
