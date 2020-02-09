@@ -9,17 +9,16 @@
 /// contain a description of the error.
 typedef enum
 {
-    OK               = 0,           ///< Operation completed successfully, no errors encountered
-    ERROR            = 1,           ///< An error was encountered that couldn't be covered by more specific errors below
-    INVALID_PRICE    = 2,           ///< Provided price is invalid
-    PRICING_CONFLICT = 3,           ///< Attempted to set a fixed price and per pound price to same item
-    PRICE_UPDATE_NOT_AVAILABLE = 4, ///< Price was updated after an item was added to the cart
-    ITEM_CONFLICT    = 5,           ///< Price for SKU configured as Fixed point but item added/removed as Per Pound, or vice versa.
-    INVALID_SKU      = 6,           ///< An Invalid SKU was provided to the API
-    NO_PRICE_DEFINED = 7,           ///< Prices have not been defined for all items in the cart
-    INVALID_WEIGHT   = 8,           ///< An invalid weight was provided to the API
-    ITEM_NOT_IN_CART = 9,           ///< Removal of item not allowed without being in cart
-    INVALID_DISCOUNT = 10,
+    OK,           ///< Operation completed successfully, no errors encountered
+    ERROR,           ///< An error was encountered that couldn't be covered by more specific errors below
+    INVALID_ARG,
+    INVALID_PRICE,              ///< Provided price and/or markdown is too large
+    INVALID_DISCOUNT,           ///< An invalid combination of values was provided to the discount functions
+    INVALID_SKU,                ///< Invalid SKU was provided to the API
+    PRICE_UPDATE_NOT_AVAILABLE, ///< Price was updated after an item was added to the cart
+    ITEM_CONFLICT,              ///< Price for SKU configured as Fixed point but item added/removed as Per Pound, or vice versa.        
+    NO_PRICE_DEFINED,           ///< Prices have not been defined for all items in the cart
+    ITEM_NOT_IN_CART,           ///< Removal of item not allowed without being in cart  
 } ReturnCode_t;
 
 #endif

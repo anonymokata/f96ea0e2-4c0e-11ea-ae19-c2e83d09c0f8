@@ -1,6 +1,14 @@
 #include "Types.h"
 #include "CartItem.h"
 
+// By default, a template class definition and the implementation must be
+// in the same file. This is due to the compilation process generating the
+// class as it is utilized within the file. By adding these statements, the
+// compiler is told to always create these variants of the CartItem class so
+// that that symbols are available during linking.
+template class CartItem<int>;
+template class CartItem<double>;
+
 template <class T>
 CartItem<T>::CartItem()
 {
@@ -68,7 +76,7 @@ ReturnCode_t CartItem<T>::applyMarkdown( double amount )
 }
 
 template <class T>
-ReturnCode_t applyDiscount( T buy_amount, double price )
+ReturnCode_t CartItem<T>::applyGetXforPriceDiscount( T buy_amount, double price )
 {
     if(buy_amount < 0 || price < 0)
     {
@@ -88,7 +96,7 @@ ReturnCode_t applyDiscount( T buy_amount, double price )
 }
 
 template <class T>
-ReturnCode_t CartItem<T>::applyDiscount( T buy_amount, double price, T limit )
+ReturnCode_t CartItem<T>::applyGetXforPriceDiscount( T buy_amount, double price, T limit )
 {
     if(buy_amount < 0 || price < 0 || limit <= 0)
     {
@@ -108,7 +116,7 @@ ReturnCode_t CartItem<T>::applyDiscount( T buy_amount, double price, T limit )
 }
 
 template <class T>
-ReturnCode_t CartItem<T>::applyDiscount( T buy_x, T get_y, double percent_off )
+ReturnCode_t CartItem<T>::applyBuyXGetYDiscount( T buy_x, T get_y, double percent_off )
 {
     if(buy_x < 0 || get_y < 0 || percent_off < 0)
     {
@@ -133,7 +141,7 @@ ReturnCode_t CartItem<T>::applyDiscount( T buy_x, T get_y, double percent_off )
 }
 
 template <class T>
-ReturnCode_t CartItem<T>::applyDiscount( T buy_x, T get_y, double percent_off, T limit )
+ReturnCode_t CartItem<T>::applyBuyXGetYDiscount( T buy_x, T get_y, double percent_off, T limit )
 {
     if(buy_x < 0 || get_y < 0 || percent_off < 0 || limit <= 0)
     {
@@ -167,7 +175,7 @@ ReturnCode_t CartItem<T>::addToCart( T amount )
 
     if(amount <= 0)
     {
-        return ERROR;
+        return INVALID_ARG;
     }
 
     amount_in_cart += amount;
@@ -185,7 +193,7 @@ ReturnCode_t CartItem<T>::removeFromCart( T amount )
 
     if(amount <= 0)
     {
-        return ERROR;
+        return INVALID_ARG;
     }
 
     amount_in_cart -= amount;

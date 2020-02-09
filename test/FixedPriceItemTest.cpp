@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "FixedPriceItem.h"
+#include "CartItem.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           setPrice Verification
@@ -7,21 +7,21 @@
 
 TEST (FixedPriceItemTest, setNegativePrice){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( INVALID_PRICE, item.setPrice( -1.0 ) );
 
 }
 
 TEST (FixedPriceItemTest, setZeroPrice){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( INVALID_PRICE, item.setPrice( 0.0 ) );
 
 }
 
 TEST (FixedPriceItemTest, updatePriceAfterAddingToCart){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(2.3) );
     ASSERT_EQ( OK, item.addToCart( 2 ) );
     ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, item.setPrice(2.2) );
@@ -30,7 +30,7 @@ TEST (FixedPriceItemTest, updatePriceAfterAddingToCart){
 
 TEST (FixedPriceItemTest, multipleSetPriceUpdates){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(2.3) );
     ASSERT_EQ( OK, item.setPrice(2.2) );
 
@@ -42,7 +42,7 @@ TEST (FixedPriceItemTest, multipleSetPriceUpdates){
 
 TEST (FixedPriceItemTest, applyMarkdownAfterItemInCart){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(2.4));
     ASSERT_EQ( OK, item.addToCart( 4 ));
     ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, item.applyMarkdown(0.2) );
@@ -51,24 +51,24 @@ TEST (FixedPriceItemTest, applyMarkdownAfterItemInCart){
 
 TEST (FixedPriceItemTest, applyMarkdownBeforePrice){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( NO_PRICE_DEFINED, item.applyMarkdown(0.2) );
 
 }
 
 TEST (FixedPriceItemTest, applyTooBigOfMarkdown){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( PRICING_CONFLICT, item.applyMarkdown(1.2) );
+    ASSERT_EQ( INVALID_PRICE, item.applyMarkdown(1.2) );
 
 }
 
 TEST (FixedPriceItemTest, negativeMarkdown){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( PRICING_CONFLICT, item.applyMarkdown(-1.0) );
+    ASSERT_EQ( INVALID_PRICE, item.applyMarkdown(-1.0) );
 
 }
 
@@ -78,7 +78,7 @@ TEST (FixedPriceItemTest, negativeMarkdown){
 
 TEST (FixedPriceItemTest, addToCartBeforePriceConfigured){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( NO_PRICE_DEFINED, item.addToCart( 1 ) );
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
     ASSERT_EQ( OK, item.addToCart( 1 ) );
@@ -87,10 +87,10 @@ TEST (FixedPriceItemTest, addToCartBeforePriceConfigured){
 
 TEST (FixedPriceItemTest, addToCartNegative){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
-    ASSERT_EQ( ERROR, item.addToCart( -1 ) );
+    ASSERT_EQ( INVALID_ARG, item.addToCart( -1 ) );
 
 }
 
@@ -100,7 +100,7 @@ TEST (FixedPriceItemTest, addToCartNegative){
 
 TEST (FixedPriceItemTest, removeFromCartBeforeInCart){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
     ASSERT_EQ( ITEM_NOT_IN_CART, item.removeFromCart( 1 ) );
 
@@ -108,7 +108,7 @@ TEST (FixedPriceItemTest, removeFromCartBeforeInCart){
 
 TEST (FixedPriceItemTest, removeMoreThanInCart){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
     ASSERT_EQ( OK, item.addToCart( 4 ) );
     ASSERT_EQ( ITEM_NOT_IN_CART, item.removeFromCart( 6 ) );
@@ -117,7 +117,7 @@ TEST (FixedPriceItemTest, removeMoreThanInCart){
 
 TEST (FixedPriceItemTest, removeItemFromCart){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
     ASSERT_EQ( OK, item.addToCart( 3 ) );
     ASSERT_EQ( OK, item.removeFromCart( 1 ) );
@@ -126,10 +126,10 @@ TEST (FixedPriceItemTest, removeItemFromCart){
 
 TEST (FixedPriceItemTest, removeItemFromCartNegativeAmount){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice( 1.0 ) );
     ASSERT_EQ( OK, item.addToCart( 3 ) );
-    ASSERT_EQ( ERROR, item.removeFromCart( -1 ) );
+    ASSERT_EQ( INVALID_ARG, item.removeFromCart( -1 ) );
 
 }
 
@@ -140,7 +140,7 @@ TEST (FixedPriceItemTest, removeItemFromCartNegativeAmount){
 TEST (FixedPriceItemTest, computeTaxWithoutPrice){
 
     double tax = 0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( NO_PRICE_DEFINED, item.computePreTax( &tax ) );
 
 }
@@ -148,7 +148,7 @@ TEST (FixedPriceItemTest, computeTaxWithoutPrice){
 TEST (FixedPriceItemTest, computeTaxNoItemsInCarts){
 
     double tax = 0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.computePreTax( &tax ) );
     ASSERT_NEAR( tax, 0.0, .01 );
@@ -158,7 +158,7 @@ TEST (FixedPriceItemTest, computeTaxNoItemsInCarts){
 TEST (FixedPriceItemTest, computeTaxNoMarkdown){
 
     double tax = 0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.addToCart(3));
     ASSERT_EQ( OK, item.computePreTax( &tax ) );
@@ -169,7 +169,7 @@ TEST (FixedPriceItemTest, computeTaxNoMarkdown){
 TEST (FixedPriceItemTest, computeTaxWithMarkdown){
 
     double tax = 0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown(0.4));
     ASSERT_EQ( OK, item.addToCart(3));
@@ -184,32 +184,32 @@ TEST (FixedPriceItemTest, computeTaxWithMarkdown){
 
 TEST (FixedPriceItemTest, buyNGetMOffNegativeValues){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
-    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( -1, 2, .5 ) );
-    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 4, -4, .5 ) );
-    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 2, 2, -.5 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyBuyXGetYDiscount( -1, 2, .5 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyBuyXGetYDiscount( 4, -4, .5 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyBuyXGetYDiscount( 2, 2, -.5 ) );
 
 }
 
 TEST (FixedPriceItemTest, buyNGetMOffInvalidPercentage){
 
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
 
     // should not be able to provide a percentage greater than 100 percent
-    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 1, 2, 1.1 ) );
-    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 4, 2, 1.01 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyBuyXGetYDiscount( 1, 2, 1.1 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyBuyXGetYDiscount( 4, 2, 1.01 ) );
 
 }
 
 TEST (FixedPriceItemTest, buyNGetMOffPerfectRound){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.addToCart( 6 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
+    ASSERT_EQ( OK, item.applyBuyXGetYDiscount( 4, 2, 0.5 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 17, .01 ); // 13.6 + 3.4
 
@@ -219,10 +219,10 @@ TEST (FixedPriceItemTest, buyNGetMOffPerfectRound){
 TEST (FixedPriceItemTest, buyNGetMOffPerfectRoundWithLimit){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.addToCart( 12 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5, 6 ) );
+    ASSERT_EQ( OK, item.applyBuyXGetYDiscount( 4, 2, 0.5, 6 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 37.40, .01 );
 
@@ -231,20 +231,20 @@ TEST (FixedPriceItemTest, buyNGetMOffPerfectRoundWithLimit){
 TEST (FixedPriceItemTest, buyNGetMOffPerfectRoundWithZeroLimit){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.addToCart( 12 ) );
-    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 4, 2, 0.5, 0 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyBuyXGetYDiscount( 4, 2, 0.5, 0 ) );
 
 }
 
 TEST (FixedPriceItemTest, buyNGetMOffWithLessThanMLeft){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.addToCart( 5 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
+    ASSERT_EQ( OK, item.applyBuyXGetYDiscount( 4, 2, 0.5 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 15.3, .01 ); // 13.6 + 1.7
 
@@ -253,10 +253,10 @@ TEST (FixedPriceItemTest, buyNGetMOffWithLessThanMLeft){
 TEST (FixedPriceItemTest, buyNGetMOffNoMLeft){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.addToCart( 4 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
+    ASSERT_EQ( OK, item.applyBuyXGetYDiscount( 4, 2, 0.5 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 13.6, .01 ); // 13.6 + 1.7
 
@@ -265,10 +265,10 @@ TEST (FixedPriceItemTest, buyNGetMOffNoMLeft){
 TEST (FixedPriceItemTest, buyNGetMOffWithLimitPreventingMOff){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.addToCart( 6 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5, 4 ) );
+    ASSERT_EQ( OK, item.applyBuyXGetYDiscount( 4, 2, 0.5, 4 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 20.4, .01 );
 
@@ -277,11 +277,11 @@ TEST (FixedPriceItemTest, buyNGetMOffWithLimitPreventingMOff){
 TEST (FixedPriceItemTest, buyNGetMOffWithMarkdown){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 6 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
+    ASSERT_EQ( OK, item.applyBuyXGetYDiscount( 4, 2, 0.5 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 15, .01 ); // 12 + 3
 
@@ -290,11 +290,11 @@ TEST (FixedPriceItemTest, buyNGetMOffWithMarkdown){
 TEST (FixedPriceItemTest, buyNGetMOffWithMarkdownWithLimit){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 6 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5, 4 ) );
+    ASSERT_EQ( OK, item.applyBuyXGetYDiscount( 4, 2, 0.5, 4 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 18, .01 ); // 12 + 6
 
@@ -303,11 +303,11 @@ TEST (FixedPriceItemTest, buyNGetMOffWithMarkdownWithLimit){
 TEST (FixedPriceItemTest, buyNForXPerfectRound){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 6 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 3, 5.00 ) );
+    ASSERT_EQ( OK, item.applyGetXforPriceDiscount( 3, 5.00 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax )); 
     ASSERT_NEAR( tax, 10, .01 );
 
@@ -316,11 +316,11 @@ TEST (FixedPriceItemTest, buyNForXPerfectRound){
 TEST (FixedPriceItemTest, buyNForXPerfectRoundWithLimit){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 6 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 3, 5.00, 3 ) );
+    ASSERT_EQ( OK, item.applyGetXforPriceDiscount( 3, 5.00, 3 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 14.0, .01 );
 
@@ -329,11 +329,11 @@ TEST (FixedPriceItemTest, buyNForXPerfectRoundWithLimit){
 TEST (FixedPriceItemTest, buyNForXNotPerfectRound){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 7 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 3, 5.00 ) );
+    ASSERT_EQ( OK, item.applyGetXforPriceDiscount( 3, 5.00 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 13, .01 );
 
@@ -342,11 +342,11 @@ TEST (FixedPriceItemTest, buyNForXNotPerfectRound){
 TEST (FixedPriceItemTest, buyNForXNotPerfectRoundWithLimit){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 7 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 3, 5.00, 3 ) );
+    ASSERT_EQ( OK, item.applyGetXforPriceDiscount( 3, 5.00, 3 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 17.0, .01 );
 
@@ -355,35 +355,35 @@ TEST (FixedPriceItemTest, buyNForXNotPerfectRoundWithLimit){
 TEST (FixedPriceItemTest, buyNForXNotPerfectRoundWithZeroLimit){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 7 ) );
-    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 3, 5.00, 0 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyGetXforPriceDiscount( 3, 5.00, 0 ) );
 
 }
 
 TEST (FixedPriceItemTest, buyNForXNegativeArguments){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 7 ) );
-    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( -3, 5.00, 3 ) );
-    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 3, -5.00, 3 ) );
-    ASSERT_EQ( INVALID_DISCOUNT, item.applyDiscount( 3, 5.00, -3 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyGetXforPriceDiscount( -3, 5.00, 3 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyGetXforPriceDiscount( 3, -5.00, 3 ) );
+    ASSERT_EQ( INVALID_DISCOUNT, item.applyGetXforPriceDiscount( 3, 5.00, -3 ) );
 
 }
 
 TEST (FixedPriceItemTest, buyNGetYForXInvalidatedByItemRemoval){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 6 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 4, 2, 0.5 ) );
+    ASSERT_EQ( OK, item.applyBuyXGetYDiscount( 4, 2, 0.5 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 15.0, .01 );
 
@@ -396,11 +396,11 @@ TEST (FixedPriceItemTest, buyNGetYForXInvalidatedByItemRemoval){
 TEST (FixedPriceItemTest, buyNForXInvalidatedByItemRemoval){
 
     double tax = 0.0;
-    FixedPriceItem item;
+    CartItem<int> item;
     ASSERT_EQ( OK, item.setPrice(3.4));
     ASSERT_EQ( OK, item.applyMarkdown( 0.4 ));
     ASSERT_EQ( OK, item.addToCart( 4 ) );
-    ASSERT_EQ( OK, item.applyDiscount( 4, 5.0 ) );
+    ASSERT_EQ( OK, item.applyGetXforPriceDiscount( 4, 5.0 ) );
     ASSERT_EQ( OK, item.computePreTax( &tax ));
     ASSERT_NEAR( tax, 5.0, .01 );
 

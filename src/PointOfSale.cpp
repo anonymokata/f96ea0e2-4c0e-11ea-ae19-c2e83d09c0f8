@@ -31,7 +31,7 @@ ReturnCode_t PointOfSale::setItemPrice( std::string sku, double price )
     // ensure that item hasn't already been added to system as a weight based
     if(w_it != weight_items.end())
     {
-        return PRICING_CONFLICT;
+        return ITEM_CONFLICT;
     }
 
     // if the item is already registered then call function to update price
@@ -66,7 +66,7 @@ ReturnCode_t PointOfSale::setPerPoundPrice( std::string sku, double price )
     // ensure that item hasn't already been added to system as a fixed based
     if(f_it != fixed_items.end())
     {
-        return PRICING_CONFLICT;
+        return ITEM_CONFLICT;
     }
 
     // if the item is already registered then call function to update price

@@ -31,10 +31,10 @@ TEST (PriceConfigurationTest, setConflictingPrices){
     PointOfSale weight_sale_first;
     
     ASSERT_EQ( OK, fixed_sale_first.setItemPrice( "bananas", 2.50 ) );
-    ASSERT_EQ( PRICING_CONFLICT, fixed_sale_first.setPerPoundPrice( "bananas", 4.50 ) );
+    ASSERT_EQ( ITEM_CONFLICT, fixed_sale_first.setPerPoundPrice( "bananas", 4.50 ) );
 
     ASSERT_EQ( OK, weight_sale_first.setPerPoundPrice( "bananas", 4.50 ) );
-    ASSERT_EQ( PRICING_CONFLICT, weight_sale_first.setItemPrice( "bananas", 2.50 ) );
+    ASSERT_EQ( ITEM_CONFLICT, weight_sale_first.setItemPrice( "bananas", 2.50 ) );
 
 }
 
@@ -53,11 +53,11 @@ TEST (PriceConfigurationTest, updateItemPriceAfterItemInCart){
 
     PointOfSale sale;
     ASSERT_EQ( OK, sale.setItemPrice( "bananas", 1.89 ) );
-    ASSERT_EQ( OK, sale.addFixedPriceItem( "bananas" ) );
+    ASSERT_EQ( OK, sale.addToCart( "bananas", 1 ) );
     ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, sale.setItemPrice( "bananas", 1.89 ) );
 
     ASSERT_EQ( OK, sale.setPerPoundPrice( "Ground Beef", 2.50 ) );
-    ASSERT_EQ( OK, sale.addItemWeight( "Ground Beef", 2.3 ) );
+    ASSERT_EQ( OK, sale.addToCart( "Ground Beef", 2.3 ) );
     ASSERT_EQ( PRICE_UPDATE_NOT_AVAILABLE, sale.setPerPoundPrice( "Ground Beef", 3.89 ) );
 
 }
@@ -73,7 +73,7 @@ TEST (PriceConfigurationTest, setPriceInvalidSku){
 TEST (PriceConfigurationTest, addItemInvalidSku){
 
     PointOfSale sale;
-    ASSERT_EQ( INVALID_SKU, sale.addFixedPriceItem( "" ) );
-    ASSERT_EQ( INVALID_SKU, sale.addItemWeight( "", 2.50 ) );
+    ASSERT_EQ( INVALID_SKU, sale.addToCart( "", 1 ) );
+    ASSERT_EQ( INVALID_SKU, sale.addToCart( "", 2.50 ) );
 
 }

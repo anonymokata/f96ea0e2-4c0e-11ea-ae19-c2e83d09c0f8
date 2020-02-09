@@ -1,3 +1,6 @@
+#ifndef CART_ITEM_H
+#define CART_ITEM_H
+
 #include "Types.h"
 
 template <class T>
@@ -11,10 +14,11 @@ class CartItem {
         ReturnCode_t setPrice( double price );
         ReturnCode_t applyMarkdown( double amount );
 
-        ReturnCode_t applyDiscount( int buy_amount, double price );
-        ReturnCode_t applyDiscount( int buy_amount, double price, int limit );
-        ReturnCode_t applyDiscount( T buy_x, T get_y, double percent_off );
-        ReturnCode_t applyDiscount( T buy_x, T get_y, double percent_off, T limit );
+        ReturnCode_t applyGetXforPriceDiscount( T buy_amount, double price );
+        ReturnCode_t applyGetXforPriceDiscount( T buy_amount, double price, T limit );
+
+        ReturnCode_t applyBuyXGetYDiscount( T buy_x, T get_y, double percent_off );
+        ReturnCode_t applyBuyXGetYDiscount( T buy_x, T get_y, double percent_off, T limit );
 
         ReturnCode_t addToCart( T amount );
         ReturnCode_t removeFromCart( T amount );
@@ -44,6 +48,9 @@ class CartItem {
         T discount_limit;
         bool is_discount_set;
         double discount_percent;
+        double discount_price;
         bool is_discount_limited;
         
 }; 
+
+#endif

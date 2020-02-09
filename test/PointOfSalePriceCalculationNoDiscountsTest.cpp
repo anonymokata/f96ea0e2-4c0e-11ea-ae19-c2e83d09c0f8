@@ -35,7 +35,7 @@ TEST_F( PreDefinedPricesFixture, MultipleFixedPriceItemsNoRemovals ){
 
     int index = 0;
     for( index = 0; index < 3; index++ ){
-        pSale->addIoCart( "Soup", 1 );
+        pSale->addToCart( "Soup", 1 );
     }
 
     pSale->addToCart( "Cookies", 1 );
