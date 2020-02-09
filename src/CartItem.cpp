@@ -1,3 +1,5 @@
+#include <cstdio>
+
 #include "Types.h"
 #include "CartItem.h"
 
@@ -245,6 +247,8 @@ ReturnCode_t CartItem<T>::computePreTax( double *pTaxAmount )
                 items_remain -= discount_x;
                 items_discounted += discount_x;
                 total += (discount_x * normalized_cost);
+
+                printf("bytes_remain=%d, items_discounted=%d\n", items_remain, items_discounted );
 
                 if((discount_limit != 0) && (items_discounted >= discount_limit))
                 {

@@ -110,7 +110,7 @@ ReturnCode_t PointOfSale::addToCart( std::string sku, int count )
         return NO_PRICE_DEFINED;
     }
 
-    return f_it->second->addToCart( 1 );
+    return f_it->second->addToCart( count );
 }
 
 ReturnCode_t PointOfSale::addToCart( std::string sku, double pounds )
@@ -169,7 +169,7 @@ ReturnCode_t PointOfSale::removeFromCart( std::string sku, int count )
         return ITEM_NOT_IN_CART;
     }
 
-    return f_it->second->removeFromCart( 1 );
+    return f_it->second->removeFromCart( count );
 }
 
 ReturnCode_t PointOfSale::removeFromCart( std::string sku, double pounds )
@@ -219,6 +219,8 @@ double PointOfSale::getPreTaxTotal()
             // TODO - How to handle
         }
 
+        printf("%s - %f\n", f_it->first.c_str(), price );
+
         // increment the total based on this item
         total += price;
         f_it++;
@@ -234,10 +236,14 @@ double PointOfSale::getPreTaxTotal()
             // TODO - How to handle
         }
 
+        printf("%s - %f\n", w_it->first.c_str(), price );
+
         // increment the total based on this item
         total += price;
         w_it++;
     }
+
+    printf("Total: %f\n", total);
 
     return total;
 }
@@ -274,30 +280,193 @@ ReturnCode_t PointOfSale::setMarkdown( std::string sku, double price )
         
 ReturnCode_t PointOfSale::applyGetXForYDiscount  ( std::string sku, int buy_x, double amount )
 {
-    return ERROR;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
+
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
+
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+    if(buy_x <= 0 || amount < 0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    // check to see if item was registered as a weight based item
+    if(w_it != weight_items.end())
+    {
+        return ITEM_CONFLICT;
+    }
+
+    if(f_it == fixed_items.end())
+    {
+        return NO_PRICE_DEFINED;
+    }
+
+    return f_it->second->applyGetXforPriceDiscount( buy_x, amount );
 }
 
 ReturnCode_t PointOfSale::applyGetXForYDiscount  ( std::string sku, int buy_x, double amount, int limit )
 {
-    return ERROR;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
+
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
+
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+    if(buy_x <= 0 || amount < 0 || limit <= 0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    // check to see if item was registered as a weight based item
+    if(w_it != weight_items.end())
+    {
+        return ITEM_CONFLICT;
+    }
+
+    if(f_it == fixed_items.end())
+    {
+        return NO_PRICE_DEFINED;
+    }
+
+    return f_it->second->applyGetXforPriceDiscount( buy_x, amount, limit );
 }
 
 ReturnCode_t PointOfSale::applyBuyXGetYAtDiscount( std::string sku, int buy_x, int get_y, double percent_off )
 {
-    return ERROR;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
+
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
+
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+    if(buy_x <= 0 || get_y < 0 || percent_off >= 1.0 || percent_off < 0.0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    // check to see if item was registered as a weight based item
+    if(w_it != weight_items.end())
+    {
+        return ITEM_CONFLICT;
+    }
+
+    if(f_it == fixed_items.end())
+    {
+        return NO_PRICE_DEFINED;
+    }
+
+    return f_it->second->applyBuyXGetYDiscount( buy_x, get_y, percent_off );
 }
 
 ReturnCode_t PointOfSale::applyBuyXGetYAtDiscount( std::string sku, double buy_x, double get_y, double percent_off )
 {
-    return ERROR;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
+
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
+
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+    if(buy_x <= 0 || get_y < 0 || percent_off >= 1.0 || percent_off < 0.0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    // check to see if item was registered as a weight based item
+    if(f_it != fixed_items.end())
+    {
+        return ITEM_CONFLICT;
+    }
+
+    if(w_it == weight_items.end())
+    {
+        return NO_PRICE_DEFINED;
+    }
+
+    return w_it->second->applyBuyXGetYDiscount( buy_x, get_y, percent_off );
 }
 
 ReturnCode_t PointOfSale::applyBuyXGetYAtDiscount( std::string sku, int buy_x, int get_y, double percent_off, int limit )
 {
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
+
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
+
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+    if(buy_x <= 0 || get_y < 0 || percent_off >= 1.0 || percent_off < 0.0 || limit < 0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    // check to see if item was registered as a weight based item
+    if(w_it != weight_items.end())
+    {
+        return ITEM_CONFLICT;
+    }
+
+    if(f_it == fixed_items.end())
+    {
+        return NO_PRICE_DEFINED;
+    }
+
+    return f_it->second->applyBuyXGetYDiscount( buy_x, get_y, percent_off, limit );
     return ERROR;
 }
 
 ReturnCode_t PointOfSale::applyBuyXGetYAtDiscount( std::string sku, double buy_x, double get_y, double percent_off, double limit )
 {
-    return ERROR;
+    map<string, CartItem<int>*>::iterator f_it;
+    map<string, CartItem<double>*>::iterator w_it;
+
+    // perform search in both maps for the given sku
+    f_it = fixed_items.find(sku);
+    w_it = weight_items.find(sku);
+
+    if(sku.length() == 0)
+    {
+        return INVALID_SKU;
+    }
+    if(buy_x <= 0 || get_y < 0 || percent_off >= 1.0 || percent_off < 0.0 || limit < 0)
+    {
+        return INVALID_DISCOUNT;
+    }
+
+    // check to see if item was registered as a weight based item
+    if(f_it != fixed_items.end())
+    {
+        return ITEM_CONFLICT;
+    }
+
+    if(w_it == weight_items.end())
+    {
+        return NO_PRICE_DEFINED;
+    }
+
+    return w_it->second->applyBuyXGetYDiscount( buy_x, get_y, percent_off, limit );
 }
