@@ -100,7 +100,7 @@ ReturnCode_t CartItem<T>::applyGetXforPriceDiscount( T buy_amount, double price 
 template <class T>
 ReturnCode_t CartItem<T>::applyGetXforPriceDiscount( T buy_amount, double price, T limit )
 {
-    if(buy_amount < 0 || price < 0 || limit <= 0)
+    if(buy_amount < 0 || price < 0 || limit <= 0 || limit < buy_amount)
     {
         return INVALID_DISCOUNT;
     }
@@ -145,7 +145,7 @@ ReturnCode_t CartItem<T>::applyBuyXGetYDiscount( T buy_x, T get_y, double percen
 template <class T>
 ReturnCode_t CartItem<T>::applyBuyXGetYDiscount( T buy_x, T get_y, double percent_off, T limit )
 {
-    if(buy_x < 0 || get_y < 0 || percent_off < 0 || limit <= 0)
+    if(buy_x < 0 || get_y < 0 || percent_off < 0 || limit <= 0 || limit < buy_x)
     {
         return INVALID_DISCOUNT;
     }
@@ -218,9 +218,11 @@ ReturnCode_t CartItem<T>::computePreTax( double *pTaxAmount )
 
     if(discount_type == X_FOR_FLAT)
     {
+        T discount_remain = discount_limit - items_discounted;
         while(items_remain >= discount_x)
         {
-            if((items_discounted >= discount_limit) && (discount_limit != 0))
+            // check if a limit was placed and if so then determine if it has been reached
+            if((discount_limit != 0) && (discount_remain < discount_x))
             {
                 break;
             }
@@ -228,15 +230,21 @@ ReturnCode_t CartItem<T>::computePreTax( double *pTaxAmount )
             items_remain -= discount_x;
             items_discounted += discount_x;
             total += discount_price;
+            discount_remain = discount_limit - items_discounted;
         }
     }
     else if(discount_type == BUY_X_GET_Y_FOR_Z_LIMIT_W)
     {
+
         while(discount_type != NO_DISCOUNT)
         {
+
+            printf("bytes_remain=%f, items_discounted=%f, discount_limit=%f\n", items_remain, items_discounted, discount_limit );
+
             // check to see if the limit has been reached for particular discount
             if((is_discount_limited) && (items_discounted >= discount_limit))
             {
+                printf("Breaking Out\n");
                 break;
             }
 
@@ -248,18 +256,21 @@ ReturnCode_t CartItem<T>::computePreTax( double *pTaxAmount )
                 items_discounted += discount_x;
                 total += (discount_x * normalized_cost);
 
-                printf("bytes_remain=%d, items_discounted=%d\n", items_remain, items_discounted );
-
                 if((discount_limit != 0) && (items_discounted >= discount_limit))
                 {
                     break;
                 }
 
                 // calculate number items that should be discounted
+                T discount_remain = (discount_limit - items_discounted);
                 T items_to_discount = discount_y;
                 if(items_remain == 0)
                 {
                     items_to_discount = 0;
+                }
+                else if(discount_limit != 0 && discount_remain < discount_y)
+                {
+                    items_to_discount = discount_remain;
                 }
                 else if(items_remain < discount_y)
                 {

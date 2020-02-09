@@ -125,12 +125,18 @@ class PointOfSale
         /// \param sku Represents the item that is being added
         ReturnCode_t removeFromCart( std::string sku, double weight );
 
+        /// \fn applyGetXForYDiscount
+        ///
+        /// Only applicable for fixed price items
         ReturnCode_t applyGetXForYDiscount  ( std::string sku, int buy_x, double amount );
         ReturnCode_t applyGetXForYDiscount  ( std::string sku, int buy_x, double amount, int limit );
 
+        /// Only applicable for fixed price items
         ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, int buy_x, int get_y, double percent_off );
-        ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, double buy_x, double get_y, double percent_off );
         ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, int buy_x, int get_y, double percent_off, int limit );
+
+        /// Only applicable for weight based items
+        ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, double buy_x, double get_y, double percent_off );
         ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, double buy_x, double get_y, double percent_off, double limit );
 
         
