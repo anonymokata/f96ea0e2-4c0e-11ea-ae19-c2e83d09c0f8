@@ -9,9 +9,9 @@
 /// contain a description of the error.
 typedef enum
 {
-    OK,           ///< Operation completed successfully, no errors encountered
-    ERROR,           ///< An error was encountered that couldn't be covered by more specific errors below
-    INVALID_ARG,
+    OK,                         ///< Operation completed successfully, no errors encountered
+    ERROR,                      ///< An error was encountered that couldn't be covered by more specific errors below
+    INVALID_ARG,                ///< Means an invalid argument is provided to the API
     INVALID_PRICE,              ///< Provided price and/or markdown is too large
     INVALID_DISCOUNT,           ///< An invalid combination of values was provided to the discount functions
     INVALID_SKU,                ///< Invalid SKU was provided to the API

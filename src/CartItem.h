@@ -3,6 +3,13 @@
 
 #include "Types.h"
 
+/// \class CartItem
+/// \brief Implements the logic of a single item in the cart
+///
+/// The PointOfSale class maintains a CartItem for each SKU within the cart. This class
+/// is utilized to handle both fixed price items and weight based items. The use of templates
+/// makes it possible to re-use all code associated with all items. The only difference in
+/// the logic is whether a whole number of items is maintained or a floating point weight.
 template <class T>
 class CartItem { 
    
@@ -11,7 +18,21 @@ class CartItem {
         CartItem();
         ~CartItem();
 
+        /// \fn setPrice
+        /// \brief Allows for setting price for the item in the cart
+        ///
+        /// Each item in the cart has a price that is defined. This price will either apply to a single
+        /// item or to a pound of the item in the cart.
+        ///
+        /// \param price Cost per item/pound of the item
         ReturnCode_t setPrice( double price );
+
+        /// \fn applyMarkdown
+        /// \brief Allows for setting a reduction in the price of the item
+        ///
+        /// Each item in the cart can be configured with a marked down price so support specials.
+        ///
+        /// \param amount Amount to take off the normal price for the special
         ReturnCode_t applyMarkdown( double amount );
 
         ReturnCode_t applyGetXforPriceDiscount( T buy_amount, double price );
