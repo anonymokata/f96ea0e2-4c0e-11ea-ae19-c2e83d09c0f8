@@ -35,7 +35,6 @@ class PointOfSale
         PointOfSale();
         ~PointOfSale();
 
-        /// \fn setMarkdown
         /// \brief Provides ability to enable a marked down price on an item
         ///
         /// The PointOfSale system supports the ability to register an item with a marked down price. In this situation,
@@ -46,7 +45,6 @@ class PointOfSale
         /// \param price Amount of discount to apply to the item
         ReturnCode_t setMarkdown( std::string sku, double price );
 
-        /// \fn getPreTaxTotal
         /// \brief Calculates the pre-tax total for all items within cart
         ///
         /// The PointOfSale system keep track of the items in the shopping cart. The items in the cart and
@@ -54,7 +52,6 @@ class PointOfSale
         /// cost of the cart.
         double getPreTaxTotal();
 
-        /// \fn setItemPrice
         /// \brief Provides ability to setup a fixed price for a SKU
         ///
         /// The PointOfSale class supports fixed price and weight based items being added to the cart. The
@@ -68,7 +65,6 @@ class PointOfSale
         /// \param price The price per unit of the item within the cart
         ReturnCode_t setItemPrice( std::string sku, double price );
 
-        /// \fn setPerPoundPrice
         /// \brief Provides ability to setup a per pound based price for a SKU
         ///
         /// The PointOfSale class supports fixed price and weight based items being added to the cart. The
@@ -83,7 +79,6 @@ class PointOfSale
         /// \param price The price per pound of the unit being added to the cart
         ReturnCode_t setPerPoundPrice( std::string sku, double price );
 
-        /// \fn addToCart
         /// \brief Adds fixed price items to the cart
         ///
         /// This function adds the specified amount of the SKU to the shopping cart. The provided SKU must have
@@ -94,7 +89,6 @@ class PointOfSale
         /// \param pound Amount of the item that should be added to the cart
         ReturnCode_t addToCart( std::string sku, int count );
 
-        /// \fn addToCart
         /// \brief Adds weight to an item in the cart
         ///
         /// This function adds the specified amount of the SKu to the shopping cart. The provided SKU must have
@@ -106,7 +100,6 @@ class PointOfSale
         /// \param pound Amount of the item that should be added to the cart, in pounds
         ReturnCode_t addToCart( std::string sku, double weight );
 
-        /// \fn removeFromCart
         /// \brief Removes fixed price items from cart
         ///
         /// To account for possible mistakes that can take place at the register, the PointOfSale system supports
@@ -118,7 +111,6 @@ class PointOfSale
         /// \param count The number of items that need to removed from the cart
         ReturnCode_t removeFromCart( std::string sku, int count );
 
-        /// \fn removeFromCart
         /// \brief Removes portion of weight based item from shopping cart
         ///
         /// To account for possible mistakes that can take place at the register, the PointOfSale system supports
@@ -130,7 +122,6 @@ class PointOfSale
         /// \param weight Amount of the item that should be removed from the cart, in pounds
         ReturnCode_t removeFromCart( std::string sku, double weight );
 
-        /// \fn applyGetXForYDiscount
         /// \brief Applys a buy X items for the Z price
         ///
         /// The following function allows for the application of a discount in which the customer is allowed
@@ -142,7 +133,6 @@ class PointOfSale
         /// \param amount Cost for purchasing the number of specified items
         ReturnCode_t applyGetXForYDiscount  ( std::string sku, int buy_x, double amount );
 
-        /// \fn applyGetXForYDiscount
         /// \brief Applys a buy X items for the Z price
         ///
         /// The following function allows for the application of a discount in which the customer is allowed
@@ -155,8 +145,7 @@ class PointOfSale
         /// \param amount Cost for purchasing the number of specified items
         ReturnCode_t applyGetXForYDiscount  ( std::string sku, int buy_x, double amount, int limit );
 
-        /// \fn applyBuyXGetYAtDiscount
-        /// \fn Applies a discount that allows the customer to purchae items at discounted rate after purchasing a qualified number of items
+        /// \brief Applies a discount that allows the customer to purchae items at discounted rate after purchasing a qualified number of items
         ///
         /// The function allows for registering a discount that allows the customer to purchase items at a discounted
         /// rate given that they have purchased a qualifying number of items. For instance, a discount of this form
@@ -168,8 +157,7 @@ class PointOfSale
         /// \param percent_off The percentage of discount on the y items. Must be between 0 and 1.0
         ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, int buy_x, int get_y, double percent_off );
 
-        /// \fn applyBuyXGetYAtDiscount
-        /// \fn Applies a discount that allows the customer to purchae items at discounted rate after purchasing a qualified number of items
+        /// \brief Applies a discount that allows the customer to purchae items at discounted rate after purchasing a qualified number of items
         ///
         /// The function allows for registering a discount that allows the customer to purchase items at a discounted
         /// rate given that they have purchased a qualifying number of items. For instance, a discount of this form
@@ -183,8 +171,7 @@ class PointOfSale
         /// \param limit The number of items that are allowed to be purchased with this discount
         ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, int buy_x, int get_y, double percent_off, int limit );
 
-        /// \fn applyBuyXGetYAtDiscount
-        /// \fn Applies a discount that allows the customer to purchae items at discounted rate after purchasing a qualified number of items
+        /// \brief Applies a discount that allows the customer to purchae items at discounted rate after purchasing a qualified number of items
         ///
         /// The function allows for registering a discount that allows the customer to purchase items at a discounted
         /// rate given that they have purchased a qualifying number of items. For instance, a discount of this form
@@ -197,8 +184,7 @@ class PointOfSale
         /// \param percent_off The percentage of discount on the y pounds. Must be between 0 and 1.0
         ReturnCode_t applyBuyXGetYAtDiscount( std::string sku, double buy_x, double get_y, double percent_off );
 
-        /// \fn applyBuyXGetYAtDiscount
-        /// \fn Applies a discount that allows the customer to purchae items at discounted rate after purchasing a qualified number of items
+        /// \brief Applies a discount that allows the customer to purchae items at discounted rate after purchasing a qualified number of items
         ///
         /// The function allows for registering a discount that allows the customer to purchase items at a discounted
         /// rate given that they have purchased a qualifying number of items. For instance, a discount of this form
